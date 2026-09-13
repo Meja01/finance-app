@@ -4,10 +4,7 @@ import org.example.finance.security.JwtService;
 import org.example.finance.users.application.LoginUserService;
 import org.example.finance.users.application.RegisterUserService;
 import org.example.finance.users.domain.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
