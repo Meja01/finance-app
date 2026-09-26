@@ -1,7 +1,6 @@
 package org.example.finance.transactions.domain;
 
 import jakarta.persistence.*;
-import net.bytebuddy.asm.Advice;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -97,14 +96,20 @@ public class Transaction {
         return transactionType;
     }
 
+    public void changeCategory(UUID categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public void update(
             BigDecimal amount,
+            UUID accountId,
             LocalDateTime dateTime,
             String note,
             TransactionType transactionType,
             UUID categoryId
     ) {
         this.amount = amount;
+        this.accountId = accountId;
         this.dateTime = dateTime;
         this.note = note;
         this.transactionType = transactionType;
