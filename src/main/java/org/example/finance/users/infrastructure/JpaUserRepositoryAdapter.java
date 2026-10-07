@@ -5,6 +5,7 @@ import org.example.finance.users.domain.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository // Create and manage an instance of this class as a Spring Bean
 public class JpaUserRepositoryAdapter implements UserRepository{
@@ -28,5 +29,10 @@ public class JpaUserRepositoryAdapter implements UserRepository{
     @Override
     public Optional<User> findByEmail(String email) {
         return repository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findById(UUID userId) {
+        return repository.findById(userId);
     }
 }
