@@ -58,4 +58,6 @@ public class RefreshToken {
     public UUID getUserId() {
         return userId;
     }
+
+    public UUID getId() {return id;}
 }

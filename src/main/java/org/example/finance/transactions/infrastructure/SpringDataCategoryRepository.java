@@ -16,4 +16,9 @@ public interface SpringDataCategoryRepository extends JpaRepository<Category, UU
             String name,
             TransactionType type
     );
+    boolean existsByUserIdAndNameAndType(
+            UUID userId,
+            String name,
+            TransactionType type
+    );
 }

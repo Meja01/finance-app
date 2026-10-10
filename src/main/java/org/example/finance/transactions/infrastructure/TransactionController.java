@@ -35,7 +35,7 @@ public class TransactionController {
     @PostMapping
     public TransactionResponse createTransaction(@RequestBody TransactionRequest request, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
-        Transaction transaction = createTransactionService.CreateTransaction(
+        Transaction transaction = createTransactionService.createTransaction(
                 userId, request.accountId(), request.categoryId(), request.amount(), request.dateTime(), request.note(), request.type());
 
         return new TransactionResponse(

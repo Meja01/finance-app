@@ -3,6 +3,7 @@ package org.example.finance.users.application;
 import org.example.finance.users.domain.User;
 import org.example.finance.users.infrastructure.SpringDataUserRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,7 @@ public class LoginUserServiceIntegrationTest {
     @Autowired
     private SpringDataUserRepository springDataUserRepository;
 
-    @AfterEach
+    @BeforeEach
     void cleanup() {
         springDataUserRepository.deleteAll();
     }

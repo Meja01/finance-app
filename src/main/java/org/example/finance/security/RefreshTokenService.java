@@ -1,6 +1,7 @@
 package org.example.finance.security;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -11,6 +12,8 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
+    @Value("${refresh-token.expiration-days}")
+    private long refreshTokenExpirationDays;
 
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
@@ -18,7 +21,7 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(UUID userId) {
         String token = generateToken();
-        LocalDateTime expiresAt = LocalDateTime.now().plusDays(30);
+        LocalDateTime expiresAt = LocalDateTime.now().plusDays(refreshTokenExpirationDays);
         RefreshToken refreshToken = new RefreshToken(userId, token, expiresAt);
         return refreshTokenRepository.save(refreshToken);
     }
@@ -30,19 +33,5 @@ public class RefreshTokenService {
         secureRandom.nextBytes(bytes);
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    public boolean validateRefreshToken(String refreshTokenToValidate) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenToValidate)
-                .orElseThrow(() -> new IllegalArgumentException("Refresh Token is invalid!"));
-
-        if (refreshToken.isRevoked()) {
-           throw new IllegalArgumentException("Refresh Token is invalid!");
-        }
-        if (refreshToken.getExpiresAt().isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Refresh Token is expired!");
-        }
-
-        return true;
     }
 }

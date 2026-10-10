@@ -21,7 +21,7 @@ public class CreateTransactionService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Transaction CreateTransaction(UUID userId,
+    public Transaction createTransaction(UUID userId,
                                          UUID accountId,
                                          UUID categoryId,
                                          BigDecimal amount,

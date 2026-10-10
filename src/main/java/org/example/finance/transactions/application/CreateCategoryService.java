@@ -22,6 +22,12 @@ public class CreateCategoryService {
         if (type == null) {
             throw new IllegalArgumentException("type must not be null!");
         }
+        if (repository.existsByNameAndTypeAndGlobalTrue(name, type)) {
+            throw new IllegalArgumentException("A global category with this name and type already exists!");
+        }
+        if (repository.existsByUserIdAndNameAndType(userId, name, type)) {
+            throw new IllegalArgumentException("You already have a category with this name and type!");
+        }
         Category category = new Category(name, type, userId, false);
         return repository.save(category);
     }

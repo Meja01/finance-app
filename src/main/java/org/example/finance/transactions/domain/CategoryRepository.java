@@ -18,4 +18,9 @@ public interface CategoryRepository {
             TransactionType type
     );
     void delete(Category category);
+    boolean existsByUserIdAndNameAndType(
+            UUID userId,
+            String name,
+            TransactionType type
+    );
 }

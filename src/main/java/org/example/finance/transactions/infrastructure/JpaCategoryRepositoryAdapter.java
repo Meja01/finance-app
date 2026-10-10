@@ -46,6 +46,12 @@ public class JpaCategoryRepositoryAdapter implements CategoryRepository {
     public void delete(Category category) {
         categoryRepository.delete(category);
     }
+
+    @Override
+    public boolean existsByUserIdAndNameAndType(UUID userId, String name, TransactionType type) {
+        return categoryRepository.existsByUserIdAndNameAndType(userId,name,type);
+    }
+
     @Override
     public Optional<Category> findByNameAndTypeAndGlobalTrue(String name, TransactionType type) {
         return categoryRepository.findByNameAndTypeAndGlobalTrue(name, type);

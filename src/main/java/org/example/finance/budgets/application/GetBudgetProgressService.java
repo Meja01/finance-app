@@ -52,8 +52,8 @@ public class GetBudgetProgressService {
                 }
             }
             BigDecimal remainingAmount = budget.getAmount().subtract(spentAmount);
-            BigDecimal percentageUsed = spentAmount.divide(budget.getAmount(), 2, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal.valueOf(100));
+            BigDecimal percentageUsed = spentAmount.multiply(BigDecimal.valueOf(100))
+                    .divide(budget.getAmount(), 2, RoundingMode.HALF_UP);
             Category category = categoryRepository.findById(budget.getCategoryId()).orElseThrow(() ->
                             new IllegalStateException("Category not found!"));
             result.add(new BudgetProgressResponse(
