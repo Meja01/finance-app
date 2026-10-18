@@ -86,38 +86,45 @@ function AccountSection ({ accessToken, accounts, setAccounts } : AccountSection
 
     return (
     <section>
-        <button
-            onClick={() => {
-                setShowCreateAccount(true)
-                setEditingAccount(null)
-            }}
-        >
-            Create account
-        </button>
-
-        {showCreateAccount && (
-            <CreateAccountForm
-                onCreate={handleCreateAccount}
-                onCancel={() => setShowCreateAccount(false)}
-            />
-        )}
-        {editingAccount && (
-            <EditAccountForm
-                account={editingAccount}
-                onUpdate={handleUpdateAccount}
-                onCancel={() => setEditingAccount(null)}
-            />
-        )}
         <h2>Accounts</h2>
-        {accounts.map(account => (
-            <AccountItem
-                key={account.id}
-                account={account}
-                onDelete={handleDeleteAccount}
-                onEdit={handleEditAccount}
-                isEditing={editingAccount?.id === account.id}
-            />
-        ))}
+        <div>
+            <button
+                onClick={() => {
+                    setShowCreateAccount(true)
+                    setEditingAccount(null)
+                }}
+            >
+                Create account
+            </button>
+        </div>
+
+        <div>
+            {showCreateAccount && (
+                <CreateAccountForm
+                    onCreate={handleCreateAccount}
+                    onCancel={() => setShowCreateAccount(false)}
+                />
+            )}
+            {editingAccount && (
+                <EditAccountForm
+                    account={editingAccount}
+                    onUpdate={handleUpdateAccount}
+                    onCancel={() => setEditingAccount(null)}
+                />
+            )}
+        </div>
+
+        <div>
+            {accounts.map(account => (
+                <AccountItem
+                    key={account.id}
+                    account={account}
+                    onDelete={handleDeleteAccount}
+                    onEdit={handleEditAccount}
+                    isEditing={editingAccount?.id === account.id}
+                />
+            ))}
+        </div>
     </section>
     )
 }

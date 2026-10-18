@@ -167,89 +167,100 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
         <section>
             <h2>Budgets</h2>
 
-            <button
-                onClick={() => {
-                    setShowCreateBudget(true)
-                    setEditingBudget(null)
-                }}
-            >
-                Create budget
-            </button>
+            <div>
+                <button
+                    onClick={() => {
+                        setShowCreateBudget(true)
+                        setEditingBudget(null)
+                    }}
+                >
+                    Create budget
+                </button>
+            </div>
 
-            {showCreateBudget && (
-                <CreateBudgetForm
-                    onCreate={handleCreateBudget}
-                    categories={categories}
-                    onCancel={() => setShowCreateBudget(false)}
-                />
-            )}
-
-            {editingBudget && (
-                <EditBudgetForm
-                    budget={editingBudget}
-                    onUpdate={handleUpdateBudget}
-                    onCancel={() => setEditingBudget(null)}
-                />
-            )}
-
-            {budgets.map(budget => {
-                const category = categories.find(
-                    category => category.id === budget.categoryId
-                )
-
-                if (!category) {
-                    throw new Error(
-                        `Category not found for budget ${budget.id}`
-                    )
-                }
-
-                return (
-                    <BudgetItem
-                        key={budget.id}
-                        budget={budget}
-                        categoryName={category.name}
-                        onDelete={handleDeleteBudget}
-                        onEdit={handleEditBudget}
+            <div>
+                {showCreateBudget && (
+                    <CreateBudgetForm
+                        onCreate={handleCreateBudget}
+                        categories={categories}
+                        onCancel={() => setShowCreateBudget(false)}
                     />
-                )
-            })}
+                )}
 
-            <h3>Budget progress</h3>
+                {editingBudget && (
+                    <EditBudgetForm
+                        budget={editingBudget}
+                        onUpdate={handleUpdateBudget}
+                        onCancel={() => setEditingBudget(null)}
+                    />
+                )}
+            </div>
 
-            <input
-                type="number"
-                value={selectedYear}
-                onChange={event =>
-                    setSelectedYear(Number(event.target.value))
-                }
-            />
+            <div>
+                {budgets.map(budget => {
+                    const category = categories.find(
+                        category => category.id === budget.categoryId
+                    )
 
-            <select
-                value={selectedMonth}
-                onChange={event =>
-                    setSelectedMonth(Number(event.target.value))
-                }
-            >
-                <option value={1}>January</option>
-                <option value={2}>February</option>
-                <option value={3}>March</option>
-                <option value={4}>April</option>
-                <option value={5}>May</option>
-                <option value={6}>June</option>
-                <option value={7}>July</option>
-                <option value={8}>August</option>
-                <option value={9}>September</option>
-                <option value={10}>October</option>
-                <option value={11}>November</option>
-                <option value={12}>December</option>
-            </select>
+                    if (!category) {
+                        throw new Error(
+                            `Category not found for budget ${budget.id}`
+                        )
+                    }
 
-            {budgetProgress.map(progress => (
-                <BudgetProgressItem
-                    key={progress.budgetId}
-                    progress={progress}
-                />
-            ))}
+                    return (
+                        <BudgetItem
+                            key={budget.id}
+                            budget={budget}
+                            categoryName={category.name}
+                            onDelete={handleDeleteBudget}
+                            onEdit={handleEditBudget}
+                        />
+                    )
+                })}
+            </div>
+
+            <div>
+                <h3>Budget progress</h3>
+
+                <div>
+                    <input
+                        type="number"
+                        value={selectedYear}
+                        onChange={event =>
+                            setSelectedYear(Number(event.target.value))
+                        }
+                    />
+                    <select
+                        value={selectedMonth}
+                        onChange={event =>
+                            setSelectedMonth(Number(event.target.value))
+                        }
+                    >
+                        <option value={1}>January</option>
+                        <option value={2}>February</option>
+                        <option value={3}>March</option>
+                        <option value={4}>April</option>
+                        <option value={5}>May</option>
+                        <option value={6}>June</option>
+                        <option value={7}>July</option>
+                        <option value={8}>August</option>
+                        <option value={9}>September</option>
+                        <option value={10}>October</option>
+                        <option value={11}>November</option>
+                        <option value={12}>December</option>
+                    </select>
+                </div>
+
+                <div>
+                    {budgetProgress.map(progress => (
+                        <BudgetProgressItem
+                            key={progress.budgetId}
+                            progress={progress}
+                        />
+                    ))}
+                </div>
+            </div>
         </section>
     )
 }

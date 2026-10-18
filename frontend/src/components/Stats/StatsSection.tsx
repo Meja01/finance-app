@@ -106,66 +106,79 @@ function StatsSection({ accessToken }: StatsSectionProps) {
     return (
         <section>
             <h2>Statistics</h2>
-            <h3>Monthly statistics</h3>
-            <input
-                type="number"
-                value={selectedYear}
-                onChange={event =>
-                    setSelectedYear(Number(event.target.value))
-                }
-            />
-            <select
-                value={selectedMonth}
-                onChange={event =>
-                    setSelectedMonth(Number(event.target.value))
-                }
-            >
-                <option value={1}>January</option>
-                <option value={2}>February</option>
-                <option value={3}>March</option>
-                <option value={4}>April</option>
-                <option value={5}>May</option>
-                <option value={6}>June</option>
-                <option value={7}>July</option>
-                <option value={8}>August</option>
-                <option value={9}>September</option>
-                <option value={10}>October</option>
-                <option value={11}>November</option>
-                <option value={12}>December</option>
-            </select>
 
-            {monthlyStats && (
-                <MonthlyStatsItem monthlyStats={monthlyStats} />
-            )}
-
-            <h3>Category statistics</h3>
-            <select
-                value={categoryStatsType}
-                onChange={event =>
-                    setCategoryStatsType(
-                        event.target.value as "INCOME" | "EXPENSE"
-                    )
-                }
-            >
-                <option value="EXPENSE">Expenses</option>
-                <option value="INCOME">Income</option>
-            </select>
-
-            {categoryStats.map(categoryStat => (
-                <CategoryStatsItem
-                    key={categoryStat.categoryId}
-                    categoryStats={categoryStat}
+            <div>
+                <h3>Period</h3>
+                <input
+                    type="number"
+                    value={selectedYear}
+                    onChange={event =>
+                        setSelectedYear(Number(event.target.value))
+                    }
                 />
-            ))}
+                <select
+                    value={selectedMonth}
+                    onChange={event =>
+                        setSelectedMonth(Number(event.target.value))
+                    }
+                >
+                    <option value={1}>January</option>
+                    <option value={2}>February</option>
+                    <option value={3}>March</option>
+                    <option value={4}>April</option>
+                    <option value={5}>May</option>
+                    <option value={6}>June</option>
+                    <option value={7}>July</option>
+                    <option value={8}>August</option>
+                    <option value={9}>September</option>
+                    <option value={10}>October</option>
+                    <option value={11}>November</option>
+                    <option value={12}>December</option>
+                </select>
+            </div>
 
-            <h3>Account balances</h3>
+            <div>
+                <h3>Monthly statistics</h3>
+                {monthlyStats && (<MonthlyStatsItem monthlyStats={monthlyStats} />)}
+            </div>
 
-            {accountBalances.map(accountBalance => (
-                <AccountBalanceItem
-                    key={accountBalance.accountId}
-                    accountBalance={accountBalance}
-                />
-            ))}
+            <div>
+                <h3>Category statistics</h3>
+
+                <div>
+                    <select
+                        value={categoryStatsType}
+                        onChange={event =>
+                            setCategoryStatsType(
+                                event.target.value as "INCOME" | "EXPENSE"
+                            )
+                        }
+                    >
+                        <option value="EXPENSE">Expenses</option>
+                        <option value="INCOME">Income</option>
+                    </select>
+                </div>
+
+                <div>
+                    {categoryStats.map(categoryStat => (
+                        <CategoryStatsItem
+                            key={categoryStat.categoryId}
+                            categoryStats={categoryStat}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <h3>Account balances</h3>
+
+                {accountBalances.map(accountBalance => (
+                    <AccountBalanceItem
+                        key={accountBalance.accountId}
+                        accountBalance={accountBalance}
+                    />
+                ))}
+            </div>
         </section>
     )
 }

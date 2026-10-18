@@ -8,6 +8,15 @@ import BudgetSection from "./components/Budgets/BudgetSection.tsx";
 import type {Category} from "./types/Category.ts";
 import RecurringTransactionSection from "./components/RecurringTransactionSection/RecurringTransactionSection.tsx";
 import StatsSection from "./components/Stats/StatsSection.tsx";
+import DashboardSection from "./components/Dashboard/DashboardSection.tsx";
+
+type Page =
+    | "dashboard"
+    | "accounts"
+    | "transactions"
+    | "budgets"
+    | "recurring"
+    | "statistics"
 
 function App() {
     const [accessToken, setAccessToken] = useState("")
@@ -17,6 +26,8 @@ function App() {
     const [accountsLoaded, setAccountsLoaded] = useState(false)
     const [categories, setCategories] = useState<Category[]>([])
     const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+
+    const [currentPage, setCurrentPage] = useState<Page>("dashboard")
 
     useEffect(() => {
         if (!accessToken) {
@@ -71,6 +82,7 @@ function App() {
 
         setAccessToken("")
         setRefreshToken("")
+        setCurrentPage("dashboard")
     }
 
     function handleLoginSuccess(
@@ -84,42 +96,96 @@ function App() {
 
     return (
         <div>
-            <h1>Finance Manager</h1>
-            {!isAuthenticated && (
-                <AuthSection
-                    onLoginSuccess={handleLoginSuccess}
-                />
-            )}
+            <header>
+                <h1>Finance Manager</h1>
 
-            {isAuthenticated && (
-                <><button onClick={handleLogout}>Logout</button>
-                <AccountSection
-                    accessToken={accessToken}
-                    accounts={accounts}
-                    setAccounts={setAccounts}/>
-                <TransactionSection
-                    accessToken={accessToken}
-                    accounts={accounts}
-                    accountsLoaded={accountsLoaded}
-                    categories={categories}
-                    setCategories={setCategories}
-                    categoriesLoaded={categoriesLoaded}
-                />
-                <BudgetSection
-                    accessToken={accessToken}
-                    categories={categories}
-                    categoriesLoaded={categoriesLoaded}
-                />
-                <RecurringTransactionSection
-                    accessToken={accessToken}
-                    accounts={accounts}
-                    accountsLoaded={accountsLoaded}
-                    categories={categories}
-                    categoriesLoaded={categoriesLoaded}
-                />
-                <StatsSection accessToken={accessToken} />
-                </>
-            )}
+                {isAuthenticated && (
+                    <nav>
+                        <button onClick={() => setCurrentPage("dashboard")}>
+                            Dashboard
+                        </button>
+
+                        <button onClick={() => setCurrentPage("accounts")}>
+                            Accounts
+                        </button>
+
+                        <button onClick={() => setCurrentPage("transactions")}>
+                            Transactions
+                        </button>
+
+                        <button onClick={() => setCurrentPage("budgets")}>
+                            Budgets
+                        </button>
+
+                        <button onClick={() => setCurrentPage("recurring")}>
+                            Recurring
+                        </button>
+
+                        <button onClick={() => setCurrentPage("statistics")}>
+                            Statistics
+                        </button>
+
+                        <button onClick={handleLogout}>
+                            Logout
+                        </button>
+                    </nav>
+                )}
+            </header>
+
+            <main>
+                {!isAuthenticated && (
+                    <AuthSection
+                        onLoginSuccess={handleLoginSuccess}
+                    />
+                )}
+
+                {isAuthenticated && currentPage === "dashboard" && (
+                    <DashboardSection accessToken={accessToken} />
+                )}
+
+                {isAuthenticated && currentPage === "accounts" && (
+                    <AccountSection
+                        accessToken={accessToken}
+                        accounts={accounts}
+                        setAccounts={setAccounts}
+                    />
+                )}
+
+                {isAuthenticated && currentPage === "transactions" && (
+                    <TransactionSection
+                        accessToken={accessToken}
+                        accounts={accounts}
+                        accountsLoaded={accountsLoaded}
+                        categories={categories}
+                        categoriesLoaded={categoriesLoaded}
+                        setCategories={setCategories}
+                    />
+                )}
+
+                {isAuthenticated && currentPage === "budgets" && (
+                    <BudgetSection
+                        accessToken={accessToken}
+                        categories={categories}
+                        categoriesLoaded={categoriesLoaded}
+                    />
+                )}
+
+                {isAuthenticated && currentPage === "recurring" && (
+                    <RecurringTransactionSection
+                        accessToken={accessToken}
+                        accounts={accounts}
+                        accountsLoaded={accountsLoaded}
+                        categories={categories}
+                        categoriesLoaded={categoriesLoaded}
+                    />
+                )}
+
+                {isAuthenticated && currentPage === "statistics" && (
+                    <StatsSection
+                        accessToken={accessToken}
+                    />
+                )}
+            </main>
         </div>
     )
 }

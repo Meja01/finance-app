@@ -234,181 +234,221 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
         setEditingCategory(category)
     }
 
+    const actionsDisabled = showCreateTransaction || editingTransaction !== null
 
     return (
-    <section>
-        <button
-            onClick={() => {
-                setShowCreateTransaction(true)
-                setEditingTransaction(null)
-            }}
-        >
-            Create transaction
-        </button>
-        {showCreateTransaction && (
-            <CreateTransactionForm
-                onCreate={handleCreateTransaction}
-                categories={categories}
-                accounts={accounts}
-                onCancel={() => setShowCreateTransaction(false)}
-            />
-        )}
-        {editingTransaction && (
-            <EditTransactionForm
-                transaction={editingTransaction}
-                onUpdate={handleUpdateTransaction}
-                categories={categories}
-                accounts={accounts}
-                onCancel={() => setEditingTransaction(null)}
-            />
-        )}
-        <h2>Transactions</h2>
-        <select
-            value={filterAccountId}
-            onChange={event => {
-                setFilterAccountId(event.target.value)
-                setFilterCategoryId("")
-                setFilterType("")
-                setFrom("")
-                setTo("")
-            }}
-        >
-            <option value="">All accounts</option>
+        <section>
+            <h2>Transactions</h2>
 
-            {accounts.map(account => (
-                <option key={account.id} value={account.id}>
-                    {account.name}
-                </option>
-            ))}
-        </select>
-        <select
-            value={filterCategoryId}
-            onChange={event => {
-                setFilterCategoryId(event.target.value)
-                setFilterAccountId("")
-                setFilterType("")
-                setFrom("")
-                setTo("")
-            }}
-        >
-            <option value="">All categories</option>
+            <div>
+                <h3>Filters</h3>
 
-            {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                    {category.name}
-                </option>
-            ))}
-        </select>
-        <select
-            value={filterType}
-            onChange={event => {
-                setFilterType(
-                    event.target.value as "" | "INCOME" | "EXPENSE"
-                )
+                <select
+                    value={filterAccountId}
+                    onChange={event => {
+                        setFilterAccountId(event.target.value)
+                        setFilterCategoryId("")
+                        setFilterType("")
+                        setFrom("")
+                        setTo("")
+                    }}
+                >
+                    <option value="">All accounts</option>
 
-                setFilterAccountId("")
-                setFilterCategoryId("")
-                setFrom("")
-                setTo("")
-            }}
-        >
-            <option value="">All types</option>
-            <option value="INCOME">Income</option>
-            <option value="EXPENSE">Expense</option>
-        </select>
-        <input
-            type="datetime-local"
-            value={from}
-            onChange={event => {
-                setFrom(event.target.value)
+                    {accounts.map(account => (
+                        <option key={account.id} value={account.id}>
+                            {account.name}
+                        </option>
+                    ))}
+                </select>
 
-                setFilterAccountId("")
-                setFilterCategoryId("")
-                setFilterType("")
-            }}
-        />
+                <select
+                    value={filterCategoryId}
+                    onChange={event => {
+                        setFilterCategoryId(event.target.value)
+                        setFilterAccountId("")
+                        setFilterType("")
+                        setFrom("")
+                        setTo("")
+                    }}
+                >
+                    <option value="">All categories</option>
 
-        <input
-            type="datetime-local"
-            value={to}
-            onChange={event => {
-                setTo(event.target.value)
+                    {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
 
-                setFilterAccountId("")
-                setFilterCategoryId("")
-                setFilterType("")
-            }}
-        />
-        <button
-            type="button"
-            onClick={() => {
-                setFilterAccountId("")
-                setFilterCategoryId("")
-                setFilterType("")
-                setFrom("")
-                setTo("")
-            }}
-        >
-            Clear filters
-        </button>
-        {transactions.map(transaction => {
-            const account = accounts.find(
-                account => account.id === transaction.accountId)
-            if (!account) {
-                throw new Error(`Account not found for transaction ${transaction.id}`)
-            }
-            const category = categories.find(
-                category => category.id === transaction.categoryId)
-            if (!category) {
-                throw new Error(
-                    `Category not found for transaction ${transaction.id}`
-                )
-            }
-            const actionsDisabled =
-                showCreateTransaction || editingTransaction !== null
-            return (
-                <TransactionItem
-                    key={transaction.id}
-                    transaction={transaction}
-                    accountName={account.name}
-                    categoryName={category.name}
-                    onDelete={handleDeleteTransaction}
-                    onEdit={handleEditTransaction}
-                    actionsDisabled={actionsDisabled}
+                <select
+                    value={filterType}
+                    onChange={event => {
+                        setFilterType(
+                            event.target.value as "" | "INCOME" | "EXPENSE"
+                        )
+
+                        setFilterAccountId("")
+                        setFilterCategoryId("")
+                        setFrom("")
+                        setTo("")
+                    }}
+                >
+                    <option value="">All types</option>
+                    <option value="INCOME">Income</option>
+                    <option value="EXPENSE">Expense</option>
+                </select>
+
+                <input
+                    type="datetime-local"
+                    value={from}
+                    onChange={event => {
+                        setFrom(event.target.value)
+
+                        setFilterAccountId("")
+                        setFilterCategoryId("")
+                        setFilterType("")
+                    }}
                 />
-            )
-        })}
 
+                <input
+                    type="datetime-local"
+                    value={to}
+                    onChange={event => {
+                        setTo(event.target.value)
 
-        <button
-            onClick={() => setShowCreateCategory(true)}
-        >
-            Create category
-        </button>
+                        setFilterAccountId("")
+                        setFilterCategoryId("")
+                        setFilterType("")
+                    }}
+                />
 
+                <button
+                    type="button"
+                    onClick={() => {
+                        setFilterAccountId("")
+                        setFilterCategoryId("")
+                        setFilterType("")
+                        setFrom("")
+                        setTo("")
+                    }}
+                >
+                    Clear filters
+                </button>
+            </div>
 
-        {showCreateCategory && (
-            <CreateCategoryForm
-                onCreate={handleCreateCategory}
-                onCancel={() => setShowCreateCategory(false)}
-            />
-        )}
-        {editingCategory && (
-            <EditCategoryForm
-                category={editingCategory}
-                onUpdate={handleUpdateCategory}
-                onCancel={() => setEditingCategory(null)}
-            />
-        )}
-        {categories.map(category => (
-            <CategoryItem
-                key={category.id}
-                category={category}
-                onEdit={handleEditCategory}
-                onDelete={handleDeleteCategory}
-            />
-        ))}
-    </section>
+            <div>
+                <h3>Transaction actions</h3>
+
+                <button
+                    onClick={() => {
+                        setShowCreateTransaction(true)
+                        setEditingTransaction(null)
+                    }}
+                >
+                    Create transaction
+                </button>
+            </div>
+
+            <div>
+                {showCreateTransaction && (
+                    <CreateTransactionForm
+                        onCreate={handleCreateTransaction}
+                        categories={categories}
+                        accounts={accounts}
+                        onCancel={() => setShowCreateTransaction(false)}
+                    />
+                )}
+
+                {editingTransaction && (
+                    <EditTransactionForm
+                        transaction={editingTransaction}
+                        onUpdate={handleUpdateTransaction}
+                        categories={categories}
+                        accounts={accounts}
+                        onCancel={() => setEditingTransaction(null)}
+                    />
+                )}
+            </div>
+
+            <div>
+                <h3>Transaction list</h3>
+
+                {transactions.map(transaction => {
+                    const account = accounts.find(
+                        account => account.id === transaction.accountId
+                    )
+
+                    if (!account) {
+                        throw new Error(
+                            `Account not found for transaction ${transaction.id}`
+                        )
+                    }
+
+                    const category = categories.find(
+                        category => category.id === transaction.categoryId
+                    )
+
+                    if (!category) {
+                        throw new Error(
+                            `Category not found for transaction ${transaction.id}`
+                        )
+                    }
+
+                    return (
+                        <TransactionItem
+                            key={transaction.id}
+                            transaction={transaction}
+                            accountName={account.name}
+                            categoryName={category.name}
+                            onDelete={handleDeleteTransaction}
+                            onEdit={handleEditTransaction}
+                            actionsDisabled={actionsDisabled}
+                        />
+                    )
+                })}
+            </div>
+
+            <div>
+                <h3>Categories</h3>
+
+                <div>
+                    <button
+                        onClick={() => setShowCreateCategory(true)}
+                    >
+                        Create category
+                    </button>
+                </div>
+
+                <div>
+                    {showCreateCategory && (
+                        <CreateCategoryForm
+                            onCreate={handleCreateCategory}
+                            onCancel={() => setShowCreateCategory(false)}
+                        />
+                    )}
+
+                    {editingCategory && (
+                        <EditCategoryForm
+                            category={editingCategory}
+                            onUpdate={handleUpdateCategory}
+                            onCancel={() => setEditingCategory(null)}
+                        />
+                    )}
+                </div>
+
+                <div>
+                    {categories.map(category => (
+                        <CategoryItem
+                            key={category.id}
+                            category={category}
+                            onEdit={handleEditCategory}
+                            onDelete={handleDeleteCategory}
+                        />
+                    ))}
+                </div>
+            </div>
+        </section>
     )
 }
 
