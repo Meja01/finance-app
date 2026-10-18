@@ -31,21 +31,21 @@ public class CategoryController {
     @GetMapping
     public List<CategoryResponse> getCategories(Authentication authentication) {
         return getCategoryService.getCategories((UUID) authentication.getPrincipal()).stream().map(category ->
-            new CategoryResponse(category.getId() ,category.getName(),category.getType(),category.getUserId())).toList();
+            new CategoryResponse(category.getId() ,category.getName(),category.getType(),category.getUserId(), category.isGlobal())).toList();
     }
 
     @PostMapping
     public CategoryResponse createCategory(@RequestBody CreateCategoryRequest request, Authentication authentication) {
         Category category = createCategoryService.createCategory((UUID) authentication.getPrincipal(), request.name(), request.type());
 
-        return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId());
+        return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId() ,category.isGlobal());
     }
 
     @PutMapping("/{categoryId}")
-    public CategoryResponse updateCategory(@PathVariable UUID categoryId, @RequestBody CreateCategoryRequest request, Authentication authentication) {
+    public CategoryResponse updateCategory(@PathVariable UUID categoryId, @RequestBody UpdateCategoryRequest request, Authentication authentication) {
         Category category = updateCategoryService.updateCategory(categoryId, (UUID) authentication.getPrincipal(), request.name());
 
-        return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId());
+        return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId() ,category.isGlobal());
     }
 
     @DeleteMapping("/{categoryId}")

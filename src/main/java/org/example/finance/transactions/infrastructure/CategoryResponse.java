@@ -8,6 +8,7 @@ public record CategoryResponse(
         UUID id,
         String name,
         TransactionType type,
-        UUID userId
+        UUID userId,
+        boolean global
 ) {
 }

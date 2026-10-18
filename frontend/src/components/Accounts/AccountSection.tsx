@@ -1,36 +1,18 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import type {Account} from "../../types/Account.ts";
 import CreateAccountForm from "./CreateAccountForm"
 import EditAccountForm from "./EditAccountForm"
 import AccountItem from "./AccountItem.tsx"
 
 type AccountSectionProps = {
-    accessToken: string
+    accessToken: string,
+    accounts: Account[],
+    setAccounts: React.Dispatch<React.SetStateAction<Account[]>>
 }
 
-function AccountSection ({ accessToken } : AccountSectionProps) {
-    const [accounts, setAccounts] = useState<Account[]>([])
+function AccountSection ({ accessToken, accounts, setAccounts } : AccountSectionProps) {
     const [editingAccount, setEditingAccount] = useState<Account | null>(null)
     const [showCreateAccount, setShowCreateAccount] = useState(false)
-
-    useEffect(() => {
-        if (!accessToken) {
-            return
-        }
-        fetch("http://localhost:8080/accounts", {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setAccounts(data)
-            })
-            .catch(error => {
-                console.error("Failed to load accounts:", error)
-            })
-    }, [accessToken])
 
     async function handleCreateAccount(
         name: string,
@@ -116,6 +98,7 @@ function AccountSection ({ accessToken } : AccountSectionProps) {
         {showCreateAccount && (
             <CreateAccountForm
                 onCreate={handleCreateAccount}
+                onCancel={() => setShowCreateAccount(false)}
             />
         )}
         {editingAccount && (

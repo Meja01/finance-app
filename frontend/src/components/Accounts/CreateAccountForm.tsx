@@ -6,9 +6,10 @@ type CreateAccountFormProps = {
         type: "CARD" | "CASH",
         initialBalance: number
     ) => Promise<void>
+    onCancel: () => void
 }
 
-function CreateAccountForm({ onCreate }: CreateAccountFormProps) {
+function CreateAccountForm({ onCreate, onCancel }: CreateAccountFormProps) {
     const [name, setName] = useState("")
     const [type, setType] = useState<"CARD" | "CASH">("CARD")
     const [initialBalance, setInitialBalance] = useState("")
@@ -55,6 +56,12 @@ function CreateAccountForm({ onCreate }: CreateAccountFormProps) {
 
             <button type="submit">
                 Create account
+            </button>
+            <button
+                type="button"
+                onClick={onCancel}
+            >
+                Cancel
             </button>
         </form>
     )
