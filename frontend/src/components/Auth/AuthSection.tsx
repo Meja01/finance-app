@@ -1,6 +1,7 @@
 import {useState} from "react";
 import LoginForm from "./LoginForm.tsx";
 import RegisterForm from "./RegisterForm.tsx";
+import {useTranslation} from "react-i18next";
 
 type AuthSectionProps = {
     onLoginSuccess: (
@@ -14,6 +15,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
     const [authMode, setAuthMode] = useState<"login" | "register">("login")
+    const { t } = useTranslation()
 
 
     async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
@@ -61,7 +63,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
 
     return (
         <section>
-            <h2>Authentication</h2>
+            <h2>{t("auth.title")}</h2>
             {authMode === "login" && (
                 <LoginForm
                     email={email}

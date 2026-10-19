@@ -1,3 +1,5 @@
+import {useTranslation} from "react-i18next";
+
 type LoginFormProps = {
     email: string
     password: string
@@ -15,11 +17,12 @@ function LoginForm({
    onSubmit,
    onSwitchToRegister
 }: LoginFormProps) {
+    const { t } = useTranslation()
     return (
         <form onSubmit={onSubmit}>
             <input
                 type="email"
-                placeholder="Email"
+                placeholder={t("auth.email")}
                 value={email}
                 onChange={event => setEmail(event.target.value)}
                 autoComplete="username"
@@ -27,21 +30,21 @@ function LoginForm({
 
             <input
                 type="password"
-                placeholder="Password"
+                placeholder={t("auth.password")}
                 value={password}
                 onChange={event => setPassword(event.target.value)}
                 autoComplete="current-password"
             />
 
             <button type="submit">
-                Login
+                {t("auth.login")}
             </button>
 
             <button
                 type="button"
                 onClick={onSwitchToRegister}
             >
-                Create account
+                {t("auth.switchToRegister")}
             </button>
         </form>
     )

@@ -1,5 +1,6 @@
 import {useState} from "react";
 import type {Category} from "../../../types/Category.ts";
+import {useTranslation} from "react-i18next";
 
 type EditCategoryFormProps = {
     category: Category
@@ -11,6 +12,7 @@ type EditCategoryFormProps = {
 }
 function EditCategoryForm({category, onUpdate, onCancel} : EditCategoryFormProps) {
     const [name, setName] = useState(category.name)
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -25,20 +27,19 @@ function EditCategoryForm({category, onUpdate, onCancel} : EditCategoryFormProps
         <form onSubmit={handleSubmit}>
             <input
                 type="text"
-                placeholder="Name"
+                placeholder={t("transactions.categories.name")}
                 value={name}
                 onChange={event => setName(event.target.value)}
                 required
             />
 
-            <button type="submit">
-                Edit category
-            </button>
+            <button type="submit">{t("transactions.categories.edit")}</button>
+
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

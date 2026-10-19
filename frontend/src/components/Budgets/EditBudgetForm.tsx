@@ -1,5 +1,6 @@
 import type {Budget} from "../../types/Budget.ts";
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 export type EditBudgetFormProps = {
     budget: Budget,
@@ -9,6 +10,7 @@ export type EditBudgetFormProps = {
 
 function EditBudgetForm({budget, onUpdate, onCancel} : EditBudgetFormProps) {
     const [amount, setAmount] = useState(budget.amount.toString())
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -21,27 +23,28 @@ function EditBudgetForm({budget, onUpdate, onCancel} : EditBudgetFormProps) {
         onCancel()
     }
 
-    return <form onSubmit={handleSubmit}>
-        <input
-            type="number"
-            step="0.01"
-            min="0.01"
-            placeholder="Amount"
-            value={amount}
-            onChange={event => setAmount(event.target.value)}
-            required
-        />
-        <button type="submit">
-            Edit budget
-        </button>
-        <button
-            type="button"
-            onClick={onCancel}
-        >
-            Cancel
-        </button>
+    return (<form onSubmit={handleSubmit}>
+            <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder={t("budgets.amount")}
+                value={amount}
+                onChange={event => setAmount(event.target.value)}
+                required
+            />
 
-    </form>
+            <button type="submit">
+                {t("budgets.edit")}
+            </button>
+
+            <button
+                type="button"
+                onClick={onCancel}
+            >
+                {t("common.cancel")}
+            </button>
+        </form>)
 }
 
 export default EditBudgetForm

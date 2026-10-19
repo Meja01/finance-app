@@ -5,6 +5,8 @@ import type {CategoryStats} from "../../types/CategoryStats.ts";
 import CategoryStatsItem from "./CategoryStatsItem.tsx";
 import type {AccountBalance} from "../../types/AccountBalance.ts";
 import AccountBalanceItem from "./AccountBalanceItem.tsx";
+import PeriodSelector from "../common/PeriodSelector.tsx";
+import {useTranslation} from "react-i18next";
 
 type StatsSectionProps = {
     accessToken: string
@@ -17,6 +19,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
     const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([])
     const [categoryStatsType, setCategoryStatsType] = useState<"INCOME" | "EXPENSE">("EXPENSE")
     const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([])
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -105,45 +108,29 @@ function StatsSection({ accessToken }: StatsSectionProps) {
 
     return (
         <section>
-            <h2>Statistics</h2>
+            <h2>{t("statistics.title")}</h2>
 
             <div>
-                <h3>Period</h3>
-                <input
-                    type="number"
-                    value={selectedYear}
-                    onChange={event =>
-                        setSelectedYear(Number(event.target.value))
-                    }
+                <h3>{t("statistics.period")}</h3>
+
+                <PeriodSelector
+                    year={selectedYear}
+                    month={selectedMonth}
+                    onYearChange={setSelectedYear}
+                    onMonthChange={setSelectedMonth}
                 />
-                <select
-                    value={selectedMonth}
-                    onChange={event =>
-                        setSelectedMonth(Number(event.target.value))
-                    }
-                >
-                    <option value={1}>January</option>
-                    <option value={2}>February</option>
-                    <option value={3}>March</option>
-                    <option value={4}>April</option>
-                    <option value={5}>May</option>
-                    <option value={6}>June</option>
-                    <option value={7}>July</option>
-                    <option value={8}>August</option>
-                    <option value={9}>September</option>
-                    <option value={10}>October</option>
-                    <option value={11}>November</option>
-                    <option value={12}>December</option>
-                </select>
             </div>
 
             <div>
-                <h3>Monthly statistics</h3>
-                {monthlyStats && (<MonthlyStatsItem monthlyStats={monthlyStats} />)}
+                <h3>{t("statistics.monthly")}</h3>
+
+                {monthlyStats && (
+                    <MonthlyStatsItem monthlyStats={monthlyStats} />
+                )}
             </div>
 
             <div>
-                <h3>Category statistics</h3>
+                <h3>{t("statistics.categories")}</h3>
 
                 <div>
                     <select
@@ -154,8 +141,8 @@ function StatsSection({ accessToken }: StatsSectionProps) {
                             )
                         }
                     >
-                        <option value="EXPENSE">Expenses</option>
-                        <option value="INCOME">Income</option>
+                        <option value="EXPENSE">{t("common.expense")}</option>
+                        <option value="INCOME">{t("common.income")}</option>
                     </select>
                 </div>
 
@@ -170,7 +157,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
             </div>
 
             <div>
-                <h3>Account balances</h3>
+                <h3>{t("statistics.accountBalances")}</h3>
 
                 {accountBalances.map(accountBalance => (
                     <AccountBalanceItem

@@ -2,6 +2,8 @@ import { useState } from "react"
 import type { Account } from "../../types/Account"
 import type { Category } from "../../types/Category"
 import type {RecurringTransaction} from "../../types/RecurringTransaction.ts";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 type EditRecurringTransactionFormProps = {
     recurringTransaction: RecurringTransaction,
@@ -28,6 +30,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
     const [note, setNote] = useState(recurringTransaction.note ?? "")
     const [frequency, setFrequency] = useState<"WEEKLY" | "MONTHLY" | "YEARLY">(recurringTransaction.frequency)
     const [endDate, setEndDate] = useState(recurringTransaction.endDate ?? "")
+    const { t } = useTranslation()
 
     async function handleSubmit(
         event: React.FormEvent<HTMLFormElement>
@@ -55,7 +58,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                 onChange={event => setAccountId(event.target.value)}
                 required
             >
-                <option value="">Select account</option>
+                <option value="">{t("recurring.selectAccount")}</option>
 
                 {accounts.map(account => (
                     <option
@@ -77,8 +80,8 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                     setCategoryId("")
                 }}
             >
-                <option value="INCOME">Income</option>
-                <option value="EXPENSE">Expense</option>
+                <option value="INCOME">{t("common.income")}</option>
+                <option value="EXPENSE">{t("common.expense")}</option>
             </select>
 
             <select
@@ -86,7 +89,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                 onChange={event => setCategoryId(event.target.value)}
                 required
             >
-                <option value="">Select category</option>
+                <option value="">{t("recurring.selectCategory")}</option>
 
                 {categories
                     .filter(category => category.type === type)
@@ -95,7 +98,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                             key={category.id}
                             value={category.id}
                         >
-                            {category.name}
+                            {getCategoryDisplayName(category, t)}
                         </option>
                     ))}
             </select>
@@ -104,7 +107,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                 type="number"
                 step="0.01"
                 min="0.01"
-                placeholder="Amount"
+                placeholder={t("recurring.amount")}
                 value={amount}
                 onChange={event => setAmount(event.target.value)}
                 required
@@ -112,7 +115,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
 
             <input
                 type="text"
-                placeholder="Note"
+                placeholder={t("recurring.note")}
                 value={note}
                 onChange={event => setNote(event.target.value)}
             />
@@ -128,13 +131,13 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
                     )
                 }
             >
-                <option value="WEEKLY">Weekly</option>
-                <option value="MONTHLY">Monthly</option>
-                <option value="YEARLY">Yearly</option>
+                <option value="WEEKLY">{t("recurring.weekly")}</option>
+                <option value="MONTHLY">{t("recurring.monthly")}</option>
+                <option value="YEARLY">{t("recurring.yearly")}</option>
             </select>
 
             <label>
-                End date
+                {t("recurring.endDate")}
                 <input
                     type="date"
                     value={endDate}
@@ -143,14 +146,14 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
             </label>
 
             <button type="submit">
-                Update recurring transaction
+                {t("recurring.update")}
             </button>
 
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

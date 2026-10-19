@@ -1,5 +1,6 @@
 import type {Account} from "../../types/Account.ts";
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 type EditAccountFormProps = {
     account: Account
@@ -16,6 +17,7 @@ function EditAccountForm({ account, onUpdate, onCancel }: EditAccountFormProps) 
     const [name, setName] = useState(account.name)
     const [type, setType] = useState<"CARD" | "CASH">(account.type)
     const [initialBalance, setInitialBalance] = useState(account.initialBalance.toString())
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -33,7 +35,7 @@ function EditAccountForm({ account, onUpdate, onCancel }: EditAccountFormProps) 
         <form onSubmit={handleSubmit}>
             <input
                 type="text"
-                placeholder="Account name"
+                placeholder={t("accounts.name")}
                 value={name}
                 onChange={event => setName(event.target.value)}
             />
@@ -44,25 +46,25 @@ function EditAccountForm({ account, onUpdate, onCancel }: EditAccountFormProps) 
                     setType(event.target.value as "CARD" | "CASH")
                 }
             >
-                <option value="CARD">Card</option>
-                <option value="CASH">Cash</option>
+                <option value="CARD">{t("accounts.card")}</option>
+                <option value="CASH">{t("accounts.cash")}</option>
             </select>
 
             <input
                 type="number"
-                placeholder="Initial balance"
+                placeholder={t("accounts.initialBalance")}
                 value={initialBalance}
                 onChange={event => setInitialBalance(event.target.value)}
             />
 
             <button type="submit">
-                Update account
+                {t("accounts.update")}
             </button>
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

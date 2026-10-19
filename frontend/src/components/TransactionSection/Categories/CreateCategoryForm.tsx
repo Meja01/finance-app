@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 type CreateCategoryFormProps = {
     onCreate: (
@@ -10,6 +11,7 @@ type CreateCategoryFormProps = {
 function CreateCategoryForm({onCreate, onCancel} : CreateCategoryFormProps) {
     const [name, setName] = useState("")
     const [type, setType] = useState<"INCOME" | "EXPENSE">("EXPENSE")
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -26,29 +28,29 @@ function CreateCategoryForm({onCreate, onCancel} : CreateCategoryFormProps) {
         <form onSubmit={handleSubmit}>
             <input
                 type="text"
-                placeholder="Name"
+                placeholder={t("transactions.categories.name")}
                 value={name}
                 onChange={event => setName(event.target.value)}
                 required
             />
+
             <select
                 value={type}
                 onChange={event => {
                     setType(event.target.value as "INCOME" | "EXPENSE")
                 }}
             >
-                <option value="INCOME">INCOME</option>
-                <option value="EXPENSE">EXPENSE</option>
+                <option value="INCOME">{t("common.income")}</option>
+                <option value="EXPENSE">{t("common.expense")}</option>
             </select>
 
-            <button type="submit">
-                Create category
-            </button>
+            <button type="submit">{t("transactions.categories.create")}</button>
+
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

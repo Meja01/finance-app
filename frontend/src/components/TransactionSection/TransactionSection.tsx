@@ -8,6 +8,8 @@ import EditTransactionForm from "./EditTransactionForm.tsx";
 import CreateCategoryForm from "./Categories/CreateCategoryForm.tsx";
 import CategoryItem from "./Categories/CategoryItem.tsx";
 import EditCategoryForm from "./Categories/EditCategoryForm.tsx";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 type TransactionSectionProps = {
     accessToken: string,
@@ -29,6 +31,7 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
     const [filterType, setFilterType] = useState<"" | "INCOME" | "EXPENSE">("")
     const [from, setFrom] = useState("")
     const [to, setTo] = useState("")
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -238,10 +241,10 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
 
     return (
         <section>
-            <h2>Transactions</h2>
+            <h2>{t("transactions.title")}</h2>
 
             <div>
-                <h3>Filters</h3>
+                <h3>{t("transactions.filters")}</h3>
 
                 <select
                     value={filterAccountId}
@@ -253,7 +256,7 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                         setTo("")
                     }}
                 >
-                    <option value="">All accounts</option>
+                    <option value="">{t("transactions.allAccounts")}</option>
 
                     {accounts.map(account => (
                         <option key={account.id} value={account.id}>
@@ -272,11 +275,11 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                         setTo("")
                     }}
                 >
-                    <option value="">All categories</option>
+                    <option value="">{t("transactions.allCategories")}</option>
 
                     {categories.map(category => (
                         <option key={category.id} value={category.id}>
-                            {category.name}
+                            {getCategoryDisplayName(category, t)}
                         </option>
                     ))}
                 </select>
@@ -294,9 +297,9 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                         setTo("")
                     }}
                 >
-                    <option value="">All types</option>
-                    <option value="INCOME">Income</option>
-                    <option value="EXPENSE">Expense</option>
+                    <option value="">{t("transactions.allTypes")}</option>
+                    <option value="INCOME">{t("common.income")}</option>
+                    <option value="EXPENSE">{t("common.expense")}</option>
                 </select>
 
                 <input
@@ -333,12 +336,12 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                         setTo("")
                     }}
                 >
-                    Clear filters
+                    {t("transactions.clearFilters")}
                 </button>
             </div>
 
             <div>
-                <h3>Transaction actions</h3>
+                <h3>{t("transactions.actions")}</h3>
 
                 <button
                     onClick={() => {
@@ -346,7 +349,7 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                         setEditingTransaction(null)
                     }}
                 >
-                    Create transaction
+                    {t("transactions.create")}
                 </button>
             </div>
 
@@ -372,7 +375,7 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
             </div>
 
             <div>
-                <h3>Transaction list</h3>
+                <h3>{t("transactions.list")}</h3>
 
                 {transactions.map(transaction => {
                     const account = accounts.find(
@@ -400,7 +403,7 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                             key={transaction.id}
                             transaction={transaction}
                             accountName={account.name}
-                            categoryName={category.name}
+                            categoryName={getCategoryDisplayName(category, t)}
                             onDelete={handleDeleteTransaction}
                             onEdit={handleEditTransaction}
                             actionsDisabled={actionsDisabled}
@@ -410,13 +413,13 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
             </div>
 
             <div>
-                <h3>Categories</h3>
+                <h3>{t("transactions.categories.title")}</h3>
 
                 <div>
                     <button
                         onClick={() => setShowCreateCategory(true)}
                     >
-                        Create category
+                        {t("transactions.categories.create")}
                     </button>
                 </div>
 

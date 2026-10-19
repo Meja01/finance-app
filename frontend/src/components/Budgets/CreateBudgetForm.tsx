@@ -1,5 +1,7 @@
 import {useState} from "react";
 import type {Category} from "../../types/Category.ts";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 export type CreateBudgetFormProps = {
     categories: Category[],
@@ -17,6 +19,7 @@ function CreateBudgetForm({categories, onCreate, onCancel}:CreateBudgetFormProps
     const [year, setYear] = useState("")
     const [month, setMonth] = useState("")
     const [amount, setAmount] = useState("")
+    const { t } = useTranslation()
 
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -41,7 +44,7 @@ function CreateBudgetForm({categories, onCreate, onCancel}:CreateBudgetFormProps
                 onChange={event => setCategoryId(event.target.value)}
                 required
             >
-                <option value="">Select category</option>
+                <option value="">{t("budgets.selectCategory")}</option>
 
                 {categories
                     .filter(category => category.type === "EXPENSE")
@@ -50,45 +53,49 @@ function CreateBudgetForm({categories, onCreate, onCancel}:CreateBudgetFormProps
                             key={category.id}
                             value={category.id}
                         >
-                            {category.name}
+                            {getCategoryDisplayName(category, t)}
                         </option>
                     ))}
             </select>
+
             <input
                 type="number"
-                placeholder="Year"
+                placeholder={t("budgets.year")}
                 value={year}
                 onChange={event => setYear(event.target.value)}
                 min="2000"
                 required
             />
+
             <input
                 type="number"
-                placeholder="Month"
+                placeholder={t("budgets.month")}
                 value={month}
                 onChange={event => setMonth(event.target.value)}
                 min="1"
                 max="12"
                 required
             />
+
             <input
                 type="number"
                 step="0.01"
                 min="0.01"
-                placeholder="Amount"
+                placeholder={t("budgets.amount")}
                 value={amount}
                 onChange={event => setAmount(event.target.value)}
                 required
             />
 
             <button type="submit">
-                Create budget
+                {t("budgets.create")}
             </button>
+
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

@@ -3,6 +3,7 @@ import type {Account} from "../../types/Account.ts";
 import CreateAccountForm from "./CreateAccountForm"
 import EditAccountForm from "./EditAccountForm"
 import AccountItem from "./AccountItem.tsx"
+import {useTranslation} from "react-i18next";
 
 type AccountSectionProps = {
     accessToken: string,
@@ -13,6 +14,7 @@ type AccountSectionProps = {
 function AccountSection ({ accessToken, accounts, setAccounts } : AccountSectionProps) {
     const [editingAccount, setEditingAccount] = useState<Account | null>(null)
     const [showCreateAccount, setShowCreateAccount] = useState(false)
+    const { t } = useTranslation()
 
     async function handleCreateAccount(
         name: string,
@@ -86,7 +88,7 @@ function AccountSection ({ accessToken, accounts, setAccounts } : AccountSection
 
     return (
     <section>
-        <h2>Accounts</h2>
+        <h2>{t("accounts.title")}</h2>
         <div>
             <button
                 onClick={() => {
@@ -94,7 +96,8 @@ function AccountSection ({ accessToken, accounts, setAccounts } : AccountSection
                     setEditingAccount(null)
                 }}
             >
-                Create account
+                {t("accounts.create")}
+
             </button>
         </div>
 

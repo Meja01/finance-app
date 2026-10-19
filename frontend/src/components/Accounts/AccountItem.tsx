@@ -1,4 +1,5 @@
 import type { Account } from "../../types/Account"
+import {useTranslation} from "react-i18next";
 
 type AccountItemProps = {
     account: Account
@@ -8,19 +9,22 @@ type AccountItemProps = {
 }
 
 function AccountItem({account, onDelete, onEdit, isEditing}: AccountItemProps) {
+    const { t } = useTranslation()
     return (
         <div>
             <h3>{account.name}</h3>
-            <p>Type: {account.type}</p>
-            <p>Initial Balance: {account.initialBalance}</p>
+            <p>{t("accounts.type")}:{" "}
+                {account.type === "CARD" ? t("accounts.card") : t("accounts.cash")}
+            </p>
+            <p>{t("accounts.initialBalance")}: {account.initialBalance}</p>
             {!isEditing && (
                 <>
                     <button onClick={() => onEdit(account)}>
-                        Edit
+                        {t("common.edit")}
                     </button>
 
                     <button onClick={() => onDelete(account.id)}>
-                        Delete
+                        {t("common.delete")}
                     </button>
                 </>
             )}

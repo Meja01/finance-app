@@ -1,6 +1,8 @@
 import type {Category} from "../../types/Category.ts";
 import type {Account} from "../../types/Account.ts";
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 type CreateTransactionFormProps = {
     categories: Category[],
@@ -23,6 +25,7 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
     const [note, setNote] = useState("")
     const [dateTime, setDateTime] = useState("")
     const [amount, setAmount] = useState("")
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -50,7 +53,8 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
                 onChange={event => setAccountId(event.target.value)}
                 required
             >
-                <option value="">Select account</option>
+                <option value="">{t("transactions.selectAccount")}</option>
+
                 {accounts.map(account => (
                     <option
                         key={account.id}
@@ -66,7 +70,7 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
                 onChange={event => setCategoryId(event.target.value)}
                 required
             >
-                <option value="">Select category</option>
+                <option value="">{t("transactions.selectCategory")}</option>
 
                 {categories
                     .filter(category => category.type === transactionType)
@@ -75,10 +79,11 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
                             key={category.id}
                             value={category.id}
                         >
-                            {category.name}
+                            {getCategoryDisplayName(category, t)}
                         </option>
                     ))}
             </select>
+
             <input
                 type="datetime-local"
                 value={dateTime}
@@ -95,34 +100,34 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
                     setCategoryId("")
                 }}
             >
-                <option value="INCOME">INCOME</option>
-                <option value="EXPENSE">EXPENSE</option>
+                <option value="INCOME">{t("common.income")}</option>
+                <option value="EXPENSE">{t("common.expense")}</option>
             </select>
 
             <input
                 type="number"
                 step="0.01"
                 min="0.01"
-                placeholder="Amount"
+                placeholder={t("transactions.amount")}
                 value={amount}
                 onChange={event => setAmount(event.target.value)}
                 required
             />
+
             <input
                 type="text"
-                placeholder="Note"
+                placeholder={t("transactions.note")}
                 value={note}
                 onChange={event => setNote(event.target.value)}
             />
 
-            <button type="submit">
-                Create transaction
-            </button>
+            <button type="submit">{t("transactions.create")}</button>
+
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

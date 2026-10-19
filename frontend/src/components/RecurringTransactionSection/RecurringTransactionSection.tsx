@@ -5,6 +5,8 @@ import type {RecurringTransaction} from "../../types/RecurringTransaction.ts";
 import RecurringTransactionItem from "./RecurringTransactionItem.tsx";
 import CreateRecurringTransactionForm from "./CreateRecurringTransactionForm.tsx";
 import EditRecurringTransactionForm from "./EditRecurringTransactionForm.tsx";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 
 type RecurringTransactionSectionProps = {
@@ -19,6 +21,7 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([])
     const [showCreateRecurringTransaction, setShowCreateRecurringTransaction] = useState(false)
     const [editingRecurringTransaction, setEditingRecurringTransaction] = useState<RecurringTransaction | null>(null)
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -180,7 +183,7 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
 
     return (
         <section>
-            <h2>Recurring Transactions</h2>
+            <h2>{t("recurring.title")}</h2>
 
             <div>
                 <button
@@ -189,7 +192,7 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
                         setEditingRecurringTransaction(null)
                     }}
                 >
-                    Create recurring transaction
+                    {t("recurring.create")}
                 </button>
             </div>
 
@@ -218,22 +221,26 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
                 {recurringTransactions.map(recurringTransaction => {
                     const account = accounts.find(
                         account => account.id === recurringTransaction.accountId)
+
                     if (!account) {
                         throw new Error(`Account not found for recurring transaction ${recurringTransaction.id}`)
                     }
+
                     const category = categories.find(
                         category => category.id === recurringTransaction.categoryId)
+
                     if (!category) {
                         throw new Error(
                             `Category not found for recurring transaction ${recurringTransaction.id}`
                         )
                     }
+
                     return (
                         <RecurringTransactionItem
                             key={recurringTransaction.id}
                             recurringTransaction={recurringTransaction}
                             accountName={account.name}
-                            categoryName={category.name}
+                            categoryName={getCategoryDisplayName(category, t)}
                             onEdit={handleEditRecurringTransaction}
                             onDeactivate={handleDeactivateRecurringTransaction}
                         />
@@ -241,7 +248,6 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
                 })}
             </div>
         </section>
-
     )
 }
 

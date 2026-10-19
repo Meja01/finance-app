@@ -9,6 +9,7 @@ import type {Category} from "./types/Category.ts";
 import RecurringTransactionSection from "./components/RecurringTransactionSection/RecurringTransactionSection.tsx";
 import StatsSection from "./components/Stats/StatsSection.tsx";
 import DashboardSection from "./components/Dashboard/DashboardSection.tsx";
+import { useTranslation } from "react-i18next"
 
 type Page =
     | "dashboard"
@@ -28,6 +29,8 @@ function App() {
     const [categoriesLoaded, setCategoriesLoaded] = useState(false)
 
     const [currentPage, setCurrentPage] = useState<Page>("dashboard")
+
+    const { t, i18n } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -97,36 +100,46 @@ function App() {
     return (
         <div>
             <header>
-                <h1>Finance Manager</h1>
+                <h1>{t("appTitle")}</h1>
 
                 {isAuthenticated && (
                     <nav>
                         <button onClick={() => setCurrentPage("dashboard")}>
-                            Dashboard
+                            {t("navigation.dashboard")}
                         </button>
 
                         <button onClick={() => setCurrentPage("accounts")}>
-                            Accounts
+                            {t("navigation.accounts")}
                         </button>
 
                         <button onClick={() => setCurrentPage("transactions")}>
-                            Transactions
+                            {t("navigation.transactions")}
                         </button>
 
                         <button onClick={() => setCurrentPage("budgets")}>
-                            Budgets
+                            {t("navigation.budgets")}
                         </button>
 
                         <button onClick={() => setCurrentPage("recurring")}>
-                            Recurring
+                            {t("navigation.recurring")}
                         </button>
 
                         <button onClick={() => setCurrentPage("statistics")}>
-                            Statistics
+                            {t("navigation.statistics")}
                         </button>
 
+                        <select
+                            value={i18n.language}
+                            onChange={event =>
+                                i18n.changeLanguage(event.target.value)
+                            }
+                        >
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+
                         <button onClick={handleLogout}>
-                            Logout
+                            {t("navigation.logout")}
                         </button>
                     </nav>
                 )}

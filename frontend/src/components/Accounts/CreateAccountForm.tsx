@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 type CreateAccountFormProps = {
     onCreate: (
@@ -13,6 +14,7 @@ function CreateAccountForm({ onCreate, onCancel }: CreateAccountFormProps) {
     const [name, setName] = useState("")
     const [type, setType] = useState<"CARD" | "CASH">("CARD")
     const [initialBalance, setInitialBalance] = useState("")
+    const { t } = useTranslation()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -32,7 +34,7 @@ function CreateAccountForm({ onCreate, onCancel }: CreateAccountFormProps) {
         <form onSubmit={handleSubmit}>
             <input
                 type="text"
-                placeholder="Account name"
+                placeholder={t("accounts.name")}
                 value={name}
                 onChange={event => setName(event.target.value)}
             />
@@ -43,25 +45,25 @@ function CreateAccountForm({ onCreate, onCancel }: CreateAccountFormProps) {
                     setType(event.target.value as "CARD" | "CASH")
                 }
             >
-                <option value="CARD">Card</option>
-                <option value="CASH">Cash</option>
+                <option value="CARD">{t("accounts.card")}</option>
+                <option value="CASH">{t("accounts.cash")}</option>
             </select>
 
             <input
                 type="number"
-                placeholder="Initial balance"
+                placeholder={t("accounts.initialBalance")}
                 value={initialBalance}
                 onChange={event => setInitialBalance(event.target.value)}
             />
 
             <button type="submit">
-                Create account
+                {t("accounts.create")}
             </button>
             <button
                 type="button"
                 onClick={onCancel}
             >
-                Cancel
+                {t("common.cancel")}
             </button>
         </form>
     )

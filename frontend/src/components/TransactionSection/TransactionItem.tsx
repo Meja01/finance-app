@@ -1,4 +1,5 @@
 import type {Transaction} from "../../types/Transaction.ts";
+import {useTranslation} from "react-i18next";
 
 
 type TransactionItemProps = {
@@ -11,22 +12,22 @@ type TransactionItemProps = {
 }
 
 function TransactionItem({transaction, accountName, categoryName, onDelete, onEdit, actionsDisabled} : TransactionItemProps) {
-    return ( <div>
-            <p>Type: {transaction.transactionType}</p>
-            <p>Amount: {transaction.amount}</p>
-            <p>Account: {accountName}</p>
-            <p>Category: {categoryName}</p>
-            <p>Date: {transaction.dateTime}</p>
-            <p>Note: {transaction.note ?? "-"}</p>
+    const { t } = useTranslation()
+    return (
+        <div>
+            <p>
+                {t("transactions.type")}:{" "}
+                {transaction.transactionType === "INCOME" ? t("common.income") : t("common.expense")}
+            </p>
+            <p>{t("transactions.amount")}: {transaction.amount}</p>
+            <p>{t("transactions.account")}: {accountName}</p>
+            <p>{t("transactions.category")}: {categoryName}</p>
+            <p>{t("transactions.date")}: {transaction.dateTime}</p>
+            <p>{t("transactions.note")}: {transaction.note ?? "-"}</p>
             {!actionsDisabled && (
                 <>
-                    <button onClick={() => onEdit(transaction)}>
-                        Edit
-                    </button>
-
-                    <button onClick={() => onDelete(transaction.id)}>
-                        Delete
-                    </button>
+                    <button onClick={() => onEdit(transaction)}>{t("common.edit")}</button>
+                    <button onClick={() => onDelete(transaction.id)}>{t("common.delete")}</button>
                 </>
             )}
         </div>

@@ -1,4 +1,5 @@
 import type {Budget} from "../../types/Budget.ts";
+import {useTranslation} from "react-i18next";
 
 export type BudgetItemProps = {
     budget: Budget,
@@ -8,20 +9,17 @@ export type BudgetItemProps = {
 }
 
 function BudgetItem({budget, categoryName, onDelete, onEdit} : BudgetItemProps) {
+    const { t } = useTranslation()
 
     return (
         <div>
-            <p>Category: {categoryName}</p>
-            <p>Amount: {budget.amount}</p>
-            <p>Year: {budget.year}</p>
-            <p>Month: {budget.month}</p>
-            <p>Date: {budget.createdAt}</p>
-            <button onClick={() => onEdit(budget)}>
-                Edit
-            </button>
-            <button onClick={() => onDelete(budget.id)}>
-                Delete
-            </button>
+            <p>{t("budgets.category")}: {categoryName}</p>
+            <p>{t("budgets.amount")}: {budget.amount}</p>
+            <p>{t("budgets.year")}: {budget.year}</p>
+            <p>{t("budgets.month")}: {budget.month}</p>
+            <p>{t("budgets.date")}: {budget.createdAt}</p>
+            <button onClick={() => onEdit(budget)}>{t("common.edit")}</button>
+            <button onClick={() => onDelete(budget.id)}>{t("common.delete")}</button>
         </div>
     )
 }

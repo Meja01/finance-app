@@ -6,6 +6,9 @@ import CreateBudgetForm from "./CreateBudgetForm.tsx";
 import EditBudgetForm from "./EditBudgetForm.tsx";
 import type {BudgetProgress} from "../../types/BudgetProgress.ts";
 import BudgetProgressItem from "./BudgetProgressItem.tsx";
+import PeriodSelector from "../common/PeriodSelector.tsx";
+import {useTranslation} from "react-i18next";
+import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 
 type BudgetSectionProps = {
     accessToken: string,
@@ -20,6 +23,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
     const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([])
     const [selectedYear, setSelectedYear] = useState(2026)
     const [selectedMonth, setSelectedMonth] = useState(10)
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -165,7 +169,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
 
     return (
         <section>
-            <h2>Budgets</h2>
+            <h2>{t("budgets.title")}</h2>
 
             <div>
                 <button
@@ -174,7 +178,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
                         setEditingBudget(null)
                     }}
                 >
-                    Create budget
+                    {t("budgets.create")}
                 </button>
             </div>
 
@@ -212,7 +216,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
                         <BudgetItem
                             key={budget.id}
                             budget={budget}
-                            categoryName={category.name}
+                            categoryName={getCategoryDisplayName(category, t)}
                             onDelete={handleDeleteBudget}
                             onEdit={handleEditBudget}
                         />
@@ -221,35 +225,15 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
             </div>
 
             <div>
-                <h3>Budget progress</h3>
+                <h3>{t("budgets.progress")}</h3>
 
                 <div>
-                    <input
-                        type="number"
-                        value={selectedYear}
-                        onChange={event =>
-                            setSelectedYear(Number(event.target.value))
-                        }
+                    <PeriodSelector
+                        year={selectedYear}
+                        month={selectedMonth}
+                        onYearChange={setSelectedYear}
+                        onMonthChange={setSelectedMonth}
                     />
-                    <select
-                        value={selectedMonth}
-                        onChange={event =>
-                            setSelectedMonth(Number(event.target.value))
-                        }
-                    >
-                        <option value={1}>January</option>
-                        <option value={2}>February</option>
-                        <option value={3}>March</option>
-                        <option value={4}>April</option>
-                        <option value={5}>May</option>
-                        <option value={6}>June</option>
-                        <option value={7}>July</option>
-                        <option value={8}>August</option>
-                        <option value={9}>September</option>
-                        <option value={10}>October</option>
-                        <option value={11}>November</option>
-                        <option value={12}>December</option>
-                    </select>
                 </div>
 
                 <div>

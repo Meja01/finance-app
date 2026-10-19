@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import type {MonthlyStats} from "../../types/MonthlyStats.ts";
 import type {AccountBalance} from "../../types/AccountBalance.ts";
+import {useTranslation} from "react-i18next";
 
 
 type DashboardSectionProps = {
@@ -12,6 +13,7 @@ function DashboardSection({accessToken}: DashboardSectionProps) {
     const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([])
     const totalBalance = accountBalances.reduce(
         (sum, accountBalance) => sum + accountBalance.balance, 0)
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (!accessToken) {
@@ -81,21 +83,21 @@ function DashboardSection({accessToken}: DashboardSectionProps) {
 
     return (
         <section>
-            <h2>Dashboard</h2>
+            <h2>{t("dashboard.title")}</h2>
 
             <div>
-                <h3>Total balance</h3>
+                <h3>{t("dashboard.totalBalance")}</h3>
                 <p>{totalBalance}</p>
             </div>
 
             <div>
-                <h3>This month</h3>
+                <h3>{t("dashboard.thisMonth")}</h3>
 
                 {monthlyStats && (
                     <div>
-                        <p>Income: {monthlyStats.income}</p>
-                        <p>Expenses: {monthlyStats.expenses}</p>
-                        <p>Balance: {monthlyStats.balance}</p>
+                        <p>{t("common.income")}: {monthlyStats.income}</p>
+                        <p>{t("statistics.expenses")}: {monthlyStats.expenses}</p>
+                        <p>{t("statistics.balance")}: {monthlyStats.balance}</p>
                     </div>
                 )}
             </div>
