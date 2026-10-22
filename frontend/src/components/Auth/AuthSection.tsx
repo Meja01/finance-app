@@ -16,54 +16,92 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
     const [name, setName] = useState("")
     const [authMode, setAuthMode] = useState<"login" | "register">("login")
     const { t } = useTranslation()
+    const [authError, setAuthError] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
 
     async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        const response = await fetch("http://localhost:8080/users/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                password: password
-            })
-        })
-        if (!response.ok) {
-            console.error("Registration failed:", response.status)
-            return
-        }
+        setAuthError(null)
+        setIsSubmitting(true)
 
-        const data = await response.json()
-        console.log("Registered user:", data)
-        setAuthMode("login")
+        try {
+            const response = await fetch(
+                "http://localhost:8080/users/register",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password
+                    })
+                }
+            )
+
+            if (!response.ok) {
+                setAuthError(t("auth.registerError"))
+                return
+            }
+
+            await response.json()
+            setAuthMode("login")
+
+        } catch (error) {
+            console.error("Registration failed:", error)
+            setAuthError(t("auth.registerError"))
+
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        const response = await fetch("http://localhost:8080/users/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        })
+        setAuthError(null)
+        setIsSubmitting(true)
 
-        const data = await response.json()
-        console.log("Logged user:", data)
-        onLoginSuccess(data.accessToken, data.refreshToken)
+        try {
+            const response = await fetch(
+                "http://localhost:8080/users/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                }
+            )
+
+            if (!response.ok) {
+                setAuthError(t("auth.loginError"))
+                return
+            }
+            const data = await response.json()
+            onLoginSuccess(data.accessToken, data.refreshToken)
+
+        } catch (error) {
+            console.error("Login failed:", error)
+            setAuthError(t("auth.loginError"))
+
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
         <section>
             <h2>{t("auth.title")}</h2>
+            {authError && (
+                <p>{authError}</p>
+            )}
             {authMode === "login" && (
                 <LoginForm
                     email={email}
@@ -72,6 +110,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
                     setPassword={setPassword}
                     onSubmit={handleLogin}
                     onSwitchToRegister={() => setAuthMode("register")}
+                    isSubmitting={isSubmitting}
                 />
             )}
 
@@ -85,6 +124,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
                     setPassword={setPassword}
                     onSubmit={handleRegister}
                     onSwitchToLogin={() => setAuthMode("login")}
+                    isSubmitting={isSubmitting}
                 />
             )}
         </section>

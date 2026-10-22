@@ -13,10 +13,11 @@ import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 type BudgetSectionProps = {
     accessToken: string,
     categories: Category[]
-    categoriesLoaded: boolean
+    categoriesLoaded: boolean,
+    categoriesError: string | null
 }
 
-function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSectionProps) {
+function BudgetSection({accessToken, categories, categoriesLoaded, categoriesError} : BudgetSectionProps) {
     const [budgets, setBudgets] = useState<Budget[]>([])
     const [showCreateBudget, setShowCreateBudget] = useState(false)
     const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
@@ -24,29 +25,52 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
     const [selectedYear, setSelectedYear] = useState(2026)
     const [selectedMonth, setSelectedMonth] = useState(10)
     const { t } = useTranslation()
+    const [budgetsLoading, setBudgetsLoading] = useState(true)
+    const [progressLoading, setProgressLoading] = useState(true)
+
+    const [budgetsError, setBudgetsError] = useState<string | null>(null)
+    const [progressError, setProgressError] = useState<string | null>(null)
+
+    const [actionError, setActionError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
-        fetch("http://localhost:8080/budgets", {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(response => {
+
+        async function loadBudgets() {
+            setBudgetsLoading(true)
+            setBudgetsError(null)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/budgets",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(`Failed to load budgets: ${response.status}`)
+                    setBudgetsError(t("budgets.loadError"))
+                    return
                 }
-                return response.json()
-            })
-            .then(data => {
-                console.log(data)
+
+                const data = await response.json()
                 setBudgets(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load budgets:", error)
-            })
+                setBudgetsError(t("budgets.loadError"))
+
+            } finally {
+                setBudgetsLoading(false)
+            }
+        }
+
+        void loadBudgets()
+
     }, [accessToken])
 
     useEffect(() => {
@@ -54,29 +78,38 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
             return
         }
 
-        fetch(
-            `http://localhost:8080/budgets/progress?year=${selectedYear}&month=${selectedMonth}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+        async function loadBudgetProgress() {
+            setProgressLoading(true)
+            setProgressError(null)
+
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/budgets/progress?year=${selectedYear}&month=${selectedMonth}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(
-                        `Failed to load budget progress: ${response.status}`
-                    )
+                    setProgressError(t("budgets.progressLoadError"))
+                    return
                 }
 
-                return response.json()
-            })
-            .then(data => {
+                const data = await response.json()
                 setBudgetProgress(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load budget progress:", error)
-            })
+                setProgressError(t("budgets.progressLoadError"))
+
+            } finally {
+                setProgressLoading(false)
+            }
+        }
+
+        void loadBudgetProgress()
 
     }, [accessToken, selectedYear, selectedMonth])
 
@@ -85,84 +118,144 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
         year: number,
         month: number,
         amount: number
-    ) {
-        const response = await fetch("http://localhost:8080/budgets", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                categoryId,
-                year,
-                month,
-                amount
-            })
-        })
+    ): Promise<boolean> {
+        setActionError(null)
 
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Backend error:", errorMessage)
-            return
+        try {
+            const response = await fetch(
+                "http://localhost:8080/budgets",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        categoryId,
+                        year,
+                        month,
+                        amount
+                    })
+                }
+            )
+
+            if (!response.ok) {
+                setActionError(t("budgets.actionError"))
+                return false
+            }
+
+            const createdBudget = await response.json()
+            setBudgets([...budgets, createdBudget])
+            setShowCreateBudget(false)
+            return true
+
+        } catch (error) {
+            console.error("Failed to create budget:", error)
+            setActionError(t("budgets.actionError"))
+            return false
         }
-
-        const createdBudget = await response.json()
-        console.log("budget data:", createdBudget)
-        setBudgets([...budgets, createdBudget])
-        setShowCreateBudget(false)
     }
 
     async function handleDeleteBudget(budgetId: string) {
-        const response = await fetch(
-            `http://localhost:8080/budgets/${budgetId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
+        setActionError(null)
+        try {
+            const response = await fetch(
+                `http://localhost:8080/budgets/${budgetId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
                 }
+            )
+
+            if (!response.ok) {
+                setActionError(t("budgets.actionError"))
+                return
             }
-        )
+            setBudgets(budgets.filter(budget => budget.id !== budgetId))
 
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Failed to delete budget:", errorMessage)
-            return
+        } catch (error) {
+            console.error("Failed to delete budget:", error)
+            setActionError(t("budgets.actionError"))
         }
-
-        setBudgets(budgets.filter(budget => budget.id !== budgetId))
     }
+    async function handleUpdateBudget(
+        budgetId: string,
+        amount: number
+    ): Promise<boolean> {
+        setActionError(null)
 
-    async function handleUpdateBudget(budgetId: string, amount: number) {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/budgets/${budgetId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        amount
+                    })
+                }
+            )
 
-        const response = await fetch(`http://localhost:8080/budgets/${budgetId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                amount
-            })
-        })
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Failed to update budget:", errorMessage)
-            return
+            if (!response.ok) {
+                setActionError(t("budgets.actionError"))
+                return false
+            }
+
+            const updatedBudget = await response.json()
+            setBudgets(budgets.map(budget => budget.id === budgetId ? updatedBudget : budget))
+            return true
+
+        } catch (error) {
+            console.error("Failed to update budget:", error)
+            setActionError(t("budgets.actionError"))
+            return false
         }
-        const updatedBudget = await response.json()
-        setBudgets(budgets.map(budget => budget.id === budgetId ? updatedBudget : budget))
-
     }
 
     function handleEditBudget(budget: Budget) {
         setEditingBudget(budget)
     }
 
+    const isLoading = budgetsLoading || progressLoading
+    const loadError = budgetsError || progressError
+
     if (!categoriesLoaded) {
         return (
             <section>
-                <h2>Budgets</h2>
-                <p>Loading...</p>
+                <h2>{t("budgets.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (categoriesError) {
+        return (
+            <section>
+                <h2>{t("budgets.title")}</h2>
+                <p>{categoriesError}</p>
+            </section>
+        )
+    }
+
+    if (isLoading) {
+        return (
+            <section>
+                <h2>{t("budgets.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (loadError) {
+        return (
+            <section>
+                <h2>{t("budgets.title")}</h2>
+                <p>{loadError}</p>
             </section>
         )
     }
@@ -181,6 +274,10 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
                     {t("budgets.create")}
                 </button>
             </div>
+
+            {actionError && (
+                <p>{actionError}</p>
+            )}
 
             <div>
                 {showCreateBudget && (
@@ -201,27 +298,30 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
             </div>
 
             <div>
-                {budgets.map(budget => {
-                    const category = categories.find(
-                        category => category.id === budget.categoryId
-                    )
+                {budgets.length === 0 ? (
+                    <p>{t("budgets.empty")}</p>
+                ) : (budgets.map(budget => {
+                            const category = categories.find(
+                                category => category.id === budget.categoryId
+                            )
 
-                    if (!category) {
-                        throw new Error(
-                            `Category not found for budget ${budget.id}`
-                        )
-                    }
+                            if (!category) {
+                                throw new Error(
+                                    `Category not found for budget ${budget.id}`
+                                )
+                            }
 
-                    return (
-                        <BudgetItem
-                            key={budget.id}
-                            budget={budget}
-                            categoryName={getCategoryDisplayName(category, t)}
-                            onDelete={handleDeleteBudget}
-                            onEdit={handleEditBudget}
-                        />
-                    )
-                })}
+                            return (
+                                <BudgetItem
+                                    key={budget.id}
+                                    budget={budget}
+                                    categoryName={getCategoryDisplayName(category, t)}
+                                    onDelete={handleDeleteBudget}
+                                    onEdit={handleEditBudget}
+                                />
+                            )
+                        })
+                )}
             </div>
 
             <div>
@@ -237,12 +337,15 @@ function BudgetSection({accessToken, categories, categoriesLoaded} : BudgetSecti
                 </div>
 
                 <div>
-                    {budgetProgress.map(progress => (
-                        <BudgetProgressItem
-                            key={progress.budgetId}
-                            progress={progress}
-                        />
-                    ))}
+                    {budgetProgress.length === 0 ? (
+                        <p>{t("budgets.progressEmpty")}</p>
+                    ) : (budgetProgress.map(progress => (
+                                <BudgetProgressItem
+                                    key={progress.budgetId}
+                                    progress={progress}
+                                />
+                            ))
+                    )}
                 </div>
             </div>
         </section>

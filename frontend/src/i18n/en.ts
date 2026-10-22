@@ -50,7 +50,9 @@ export const en = {
             initialBalance: "Initial balance",
             type: "Type",
             card: "Card",
-            cash: "Cash"
+            cash: "Cash",
+            empty: "No accounts yet.",
+            actionError: "Something went wrong. Please try again."
         },
 
         auth: {
@@ -61,7 +63,9 @@ export const en = {
             password: "Password",
             name: "Name",
             switchToLogin: "Already have an account? Login",
-            switchToRegister: "Don't have an account? Register"
+            switchToRegister: "Don't have an account? Register",
+            loginError: "Login failed. Please check your credentials.",
+            registerError: "Registration failed. Please try again."
         },
 
         transactions: {
@@ -78,7 +82,8 @@ export const en = {
                 title: "Categories",
                 name: "Name",
                 create: "Create category",
-                edit: "Edit category"
+                edit: "Edit category",
+                loadError: "Failed to load categories."
             },
             type: "Type",
             amount: "Amount",
@@ -89,6 +94,9 @@ export const en = {
             selectAccount: "Select account",
             selectCategory: "Select category",
             edit: "Edit transaction",
+            loadError: "Failed to load transactions.",
+            empty: "No transactions found.",
+            actionError: "Something went wrong. Please try again."
         },
 
         budgets: {
@@ -105,7 +113,12 @@ export const en = {
             progressBudget: "Budget",
             spent: "Spent",
             remaining: "Remaining",
-            used: "Used"
+            used: "Used",
+            loadError: "Failed to load budgets.",
+            progressLoadError: "Failed to load budget progress.",
+            actionError: "Something went wrong. Please try again.",
+            empty: "No budgets yet.",
+            progressEmpty: "No budget progress available for this period."
         },
 
         statistics: {
@@ -118,7 +131,8 @@ export const en = {
             balance: "Balance",
             category: "Category",
             amount: "Amount",
-            account: "Account"
+            account: "Account",
+            loadError: "Failed to load statistics."
         },
 
         recurring: {
@@ -139,13 +153,17 @@ export const en = {
             note: "Note",
             selectAccount: "Select account",
             selectCategory: "Select category",
-            update: "Update recurring transaction"
+            update: "Update recurring transaction",
+            loadError: "Failed to load recurring transactions.",
+            actionError: "Something went wrong. Please try again.",
+            empty: "No recurring transactions yet."
         },
 
         dashboard: {
             title: "Dashboard",
             totalBalance: "Total balance",
-            thisMonth: "This month"
+            thisMonth: "This month",
+            loadError: "Failed to load dashboard data."
         },
 
         categories: {
@@ -161,7 +179,8 @@ export const en = {
                 education: "Education",
                 health: "Health",
                 apparel: "Apparel"
-            }
+            },
+            actionError: "Something went wrong. Please try again."
         }
     }
 }

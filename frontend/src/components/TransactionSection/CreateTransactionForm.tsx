@@ -14,7 +14,7 @@ type CreateTransactionFormProps = {
         dateTime: string,
         note: string | null,
         transactionType: "INCOME" | "EXPENSE"
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -30,7 +30,7 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onCreate(
+        const success = await onCreate(
             accountId,
             categoryId,
             Number(amount),
@@ -39,12 +39,14 @@ function CreateTransactionForm({categories, accounts, onCreate, onCancel} : Crea
             transactionType
         )
 
-        setAccountId("")
-        setCategoryId("")
-        setTransactionType("EXPENSE")
-        setNote("")
-        setDateTime("")
-        setAmount("")
+        if (success) {
+            setAccountId("")
+            setCategoryId("")
+            setTransactionType("EXPENSE")
+            setNote("")
+            setDateTime("")
+            setAmount("")
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

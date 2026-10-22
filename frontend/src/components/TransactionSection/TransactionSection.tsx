@@ -17,10 +17,12 @@ type TransactionSectionProps = {
     accountsLoaded: boolean
     categories: Category[],
     setCategories: React.Dispatch<React.SetStateAction<Category[]>>
-    categoriesLoaded: boolean
+    categoriesLoaded: boolean,
+    categoriesError: string | null,
+    accountsError: string | null
 }
 
-function TransactionSection({accessToken, accounts, accountsLoaded, categories, setCategories, categoriesLoaded} : TransactionSectionProps) {
+function TransactionSection({accessToken, accounts, accountsLoaded, categories, setCategories, categoriesLoaded, categoriesError, accountsError} : TransactionSectionProps) {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [showCreateTransaction, setShowCreateTransaction] = useState(false)
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
@@ -32,43 +34,56 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
     const [from, setFrom] = useState("")
     const [to, setTo] = useState("")
     const { t } = useTranslation()
+    const [isLoading, setIsLoading] = useState(true)
+    const [loadError, setLoadError] = useState<string | null>(null)
+    const [actionError, setActionError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
 
-        let url = "http://localhost:8080/transactions"
+        async function loadTransactions() {
+            setIsLoading(true)
+            setLoadError(null)
 
-        if (filterAccountId) {
-            url += `?accountId=${filterAccountId}`
-        } else if (filterCategoryId) {
-            url += `?categoryId=${filterCategoryId}`
-        } else if (filterType) {
-            url += `?type=${filterType}`
-        } else if (from && to) {
-            url += `?from=${from}&to=${to}`
+            let url = "http://localhost:8080/transactions"
+
+            if (filterAccountId) {
+                url += `?accountId=${filterAccountId}`
+            } else if (filterCategoryId) {
+                url += `?categoryId=${filterCategoryId}`
+            } else if (filterType) {
+                url += `?type=${filterType}`
+            } else if (from && to) {
+                url += `?from=${from}&to=${to}`
+            }
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                })
+
+                if (!response.ok) {
+                    setLoadError(t("transactions.loadError"))
+                    return
+                }
+
+                const data = await response.json()
+                setTransactions(data)
+
+            } catch (error) {
+                console.error(error)
+                setLoadError(t("transactions.loadError"))
+
+            } finally {
+                setIsLoading(false)
+            }
         }
 
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(
-                        `Failed to load transactions: ${response.status}`
-                    )
-                }
-                return response.json()
-            })
-            .then(data => {
-                setTransactions(data)
-            })
-            .catch(error => {
-                console.error("Failed to load transactions:", error)
-            })
+        void loadTransactions()
 
     }, [accessToken, filterAccountId, filterCategoryId, filterType, from, to])
 
@@ -79,48 +94,65 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
         dateTime: string,
         note: string | null,
         transactionType: "INCOME" | "EXPENSE"
-    ) {
-        const response = await fetch("http://localhost:8080/transactions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                accountId,
-                categoryId,
-                amount,
-                dateTime,
-                note,
-                type: transactionType
+    ): Promise<boolean> {
+        setActionError(null)
+        try {
+            const response = await fetch("http://localhost:8080/transactions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    accountId,
+                    categoryId,
+                    amount,
+                    dateTime,
+                    note,
+                    type: transactionType
+                })
             })
-        })
 
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Backend error:", errorMessage)
-            return
+            if (!response.ok) {
+                setActionError(t("transactions.actionError"))
+                return false
+            }
+
+            const createdTransaction = await response.json()
+            setTransactions([...transactions, createdTransaction])
+            setShowCreateTransaction(false)
+            return true
         }
-
-        const createdTransaction = await response.json()
-        console.log("transaction data:", createdTransaction)
-        setTransactions([...transactions, createdTransaction])
-        setShowCreateTransaction(false)
+        catch (error) {
+            console.error(error)
+            setActionError(t("transactions.actionError"))
+            return false
+        }
     }
 
-    async function handleDeleteTransaction(
-        transactionId: string
-    ) {
-        await fetch(
-            `http://localhost:8080/transactions/${transactionId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
+    async function handleDeleteTransaction(transactionId: string) {
+        setActionError(null)
+        try {
+            const response = await fetch(
+                `http://localhost:8080/transactions/${transactionId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
                 }
+            )
+            if (!response.ok) {
+                setActionError(t("transactions.actionError"))
+                return
             }
-        )
-        setTransactions(transactions.filter(transaction => transaction.id !== transactionId))
+            setTransactions(transactions.filter(
+                transaction => transaction.id !== transactionId)
+            )
+        } catch (error) {
+            console.error(error)
+            setActionError(t("transactions.actionError"))
+        }
     }
 
     async function handleUpdateTransaction(
@@ -130,29 +162,41 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
         amount: number,
         dateTime: string,
         note: string | null,
-        transactionType: "INCOME" | "EXPENSE") {
+        transactionType: "INCOME" | "EXPENSE"): Promise<boolean> {
+        setActionError(null)
 
-        const response = await fetch(`http://localhost:8080/transactions/${transactionId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                transactionId,
-                accountId,
-                categoryId,
-                amount,
-                dateTime,
-                note,
-                type: transactionType
+        try {
+            const response = await fetch(`http://localhost:8080/transactions/${transactionId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    transactionId,
+                    accountId,
+                    categoryId,
+                    amount,
+                    dateTime,
+                    note,
+                    type: transactionType
+                })
             })
-        })
 
-        const updatedTransaction = await response.json()
+            if (!response.ok) {
+                setActionError(t("transactions.actionError"))
+                return false
+            }
 
-        setTransactions(transactions.map(transaction => transaction.id === transactionId ? updatedTransaction : transaction))
-
+            const updatedTransaction = await response.json()
+            setTransactions(transactions.map(transaction => transaction.id === transactionId ? updatedTransaction : transaction))
+            return true
+        }
+        catch (error) {
+            console.error(error)
+            setActionError(t("transactions.actionError"))
+            return false
+        }
     }
 
     function handleEditTransaction(transaction: Transaction) {
@@ -160,77 +204,88 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
         setShowCreateTransaction(false)
     }
 
-    if (!accountsLoaded || !categoriesLoaded) {
-        return (
-            <section>
-                <h2>Transactions</h2>
-                <p>Loading...</p>
-            </section>
-        )
+    async function handleCreateCategory(name: string, type: "INCOME" | "EXPENSE"):Promise<boolean> {
+        setActionError(null)
+        try {
+            const response = await fetch("http://localhost:8080/categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    name,
+                    type
+                })
+            })
+            if (!response.ok) {
+                setActionError(t("categories.actionError"))
+                return false
+            }
+            const createdCategory = await response.json()
+            setCategories([...categories, createdCategory])
+            setShowCreateCategory(false)
+            return true
+        }
+        catch (error) {
+            console.error(error)
+            setActionError(t("categories.actionError"))
+            return false
+        }
     }
 
-    async function handleCreateCategory(name: string, type: "INCOME" | "EXPENSE") {
-        const response = await fetch("http://localhost:8080/categories", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                name,
-                type
+    async function handleUpdateCategory(categoryId: string, name: string):Promise<boolean> {
+        setActionError(null)
+        try {
+            const response = await fetch(`http://localhost:8080/categories/${categoryId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    name
+                })
             })
-        })
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Failed to create category:", errorMessage)
-            return
+            if (!response.ok) {
+                setActionError(t("categories.actionError"))
+                return false
+            }
+            const updatedCategory = await response.json()
+            setCategories(categories.map(category => category.id === categoryId ? updatedCategory : category))
+            return true
         }
-        const createdCategory = await response.json()
-        setCategories([...categories, createdCategory])
-        setShowCreateCategory(false)
-    }
-
-    async function handleUpdateCategory(categoryId: string, name: string) {
-
-        const response = await fetch(`http://localhost:8080/categories/${categoryId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                name
-            })
-        })
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Failed to update category:", errorMessage)
-            return
+        catch (error) {
+            console.error(error)
+            setActionError(t("categories.actionError"))
+            return false
         }
-        const updatedCategory = await response.json()
-        setCategories(categories.map(category => category.id === categoryId ? updatedCategory : category))
 
     }
 
     async function handleDeleteCategory(categoryId: string) {
-        const response = await fetch(
-            `http://localhost:8080/categories/${categoryId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
+        setActionError(null)
+        try {
+            const response = await fetch(
+                `http://localhost:8080/categories/${categoryId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
                 }
+            )
+
+            if (!response.ok) {
+                setActionError(t("categories.actionError"))
+                return
             }
-        )
 
-        if (!response.ok) {
-            const errorMessage = await response.text()
-            console.error("Failed to delete category:", errorMessage)
-            return
+            setCategories(categories.filter(category => category.id !== categoryId))
+        } catch (error) {
+            console.error(error)
+            setActionError(t("categories.actionError"))
         }
-
-        setCategories(categories.filter(category => category.id !== categoryId))
     }
 
     function handleEditCategory(category: Category) {
@@ -238,6 +293,51 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
     }
 
     const actionsDisabled = showCreateTransaction || editingTransaction !== null
+
+    if (!accountsLoaded || !categoriesLoaded) {
+        return (
+            <section>
+                <h2>{t("transactions.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (accountsError) {
+        return (
+            <section>
+                <h2>{t("transactions.title")}</h2>
+                <p>{accountsError}</p>
+            </section>
+        )
+    }
+
+    if (categoriesError) {
+        return (
+            <section>
+                <h2>{t("transactions.title")}</h2>
+                <p>{categoriesError}</p>
+            </section>
+        )
+    }
+
+    if (isLoading) {
+        return (
+            <section>
+                <h2>{t("transactions.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (loadError) {
+        return (
+            <section>
+                <h2>{t("transactions.title")}</h2>
+                <p>{loadError}</p>
+            </section>
+        )
+    }
 
     return (
         <section>
@@ -353,6 +453,10 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                 </button>
             </div>
 
+            {actionError && (
+                <p>{actionError}</p>
+            )}
+
             <div>
                 {showCreateTransaction && (
                     <CreateTransactionForm
@@ -377,7 +481,9 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
             <div>
                 <h3>{t("transactions.list")}</h3>
 
-                {transactions.map(transaction => {
+                {transactions.length === 0 ? (
+                    <p>{t("transactions.empty")}</p>
+                ) : (transactions.map(transaction => {
                     const account = accounts.find(
                         account => account.id === transaction.accountId
                     )
@@ -409,7 +515,8 @@ function TransactionSection({accessToken, accounts, accountsLoaded, categories, 
                             actionsDisabled={actionsDisabled}
                         />
                     )
-                })}
+                })
+                )}
             </div>
 
             <div>

@@ -50,7 +50,9 @@ export const de = {
             initialBalance: "Anfangssaldo",
             card: "Karte",
             cash: "Bargeld",
-            type: "Typ"
+            type: "Typ",
+            empty: "Noch keine Konten vorhanden.",
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut."
         },
 
         auth: {
@@ -61,7 +63,9 @@ export const de = {
             password: "Passwort",
             name: "Name",
             switchToLogin: "Du hast bereits ein Konto? Anmelden",
-            switchToRegister: "Du hast noch kein Konto? Registrieren"
+            switchToRegister: "Du hast noch kein Konto? Registrieren",
+            loginError: "Anmeldung fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.",
+            registerError: "Registrierung fehlgeschlagen. Bitte versuche es erneut."
         },
 
         transactions: {
@@ -78,7 +82,8 @@ export const de = {
                 title: "Kategorien",
                 name: "Name",
                 create: "Kategorie erstellen",
-                edit: "Kategorie bearbeiten"
+                edit: "Kategorie bearbeiten",
+                loadError: "Kategorien konnten nicht geladen werden."
             },
             type: "Typ",
             amount: "Betrag",
@@ -88,7 +93,10 @@ export const de = {
             note: "Notiz",
             selectAccount: "Konto auswählen",
             selectCategory: "Kategorie auswählen",
-            edit: "Transaktion bearbeiten"
+            edit: "Transaktion bearbeiten",
+            loadError: "Transaktionen konnten nicht geladen werden.",
+            empty: "Keine Transaktionen gefunden.",
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut."
         },
 
         budgets: {
@@ -105,7 +113,12 @@ export const de = {
             progressBudget: "Budget",
             spent: "Ausgegeben",
             remaining: "Verbleibend",
-            used: "Verwendet"
+            used: "Verwendet",
+            loadError: "Budgets konnten nicht geladen werden.",
+            progressLoadError: "Budgetfortschritt konnte nicht geladen werden.",
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+            empty: "Noch keine Budgets vorhanden.",
+            progressEmpty: "Für diesen Zeitraum ist kein Budgetfortschritt verfügbar."
         },
 
         statistics: {
@@ -118,7 +131,8 @@ export const de = {
             balance: "Saldo",
             category: "Kategorie",
             amount: "Betrag",
-            account: "Konto"
+            account: "Konto",
+            loadError: "Statistiken konnten nicht geladen werden."
         },
 
         recurring: {
@@ -139,13 +153,17 @@ export const de = {
             note: "Notiz",
             selectAccount: "Konto auswählen",
             selectCategory: "Kategorie auswählen",
-            update: "Wiederkehrende Transaktion aktualisieren"
+            update: "Wiederkehrende Transaktion aktualisieren",
+            loadError: "Wiederkehrende Transaktionen konnten nicht geladen werden.",
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+            empty: "Noch keine wiederkehrenden Transaktionen vorhanden."
         },
 
         dashboard: {
             title: "Übersicht",
             totalBalance: "Gesamtsaldo",
-            thisMonth: "Dieser Monat"
+            thisMonth: "Dieser Monat",
+            loadError: "Dashboard-Daten konnten nicht geladen werden."
         },
 
         categories: {
@@ -161,7 +179,8 @@ export const de = {
                 education: "Bildung",
                 health: "Gesundheit",
                 apparel: "Kleidung"
-            }
+            },
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut."
         }
     }
 }

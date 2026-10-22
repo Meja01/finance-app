@@ -8,7 +8,8 @@ type RegisterFormProps = {
     setEmail: (value: string) => void
     setPassword: (value: string) => void
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
-    onSwitchToLogin: () => void
+    onSwitchToLogin: () => void,
+    isSubmitting: boolean
 }
 
 function RegisterForm({
@@ -19,7 +20,8 @@ function RegisterForm({
                           setEmail,
                           setPassword,
                           onSubmit,
-                          onSwitchToLogin
+                          onSwitchToLogin,
+                          isSubmitting
                       }: RegisterFormProps) {
     const { t } = useTranslation()
     return (
@@ -46,7 +48,7 @@ function RegisterForm({
                 autoComplete="new-password"
             />
 
-            <button type="submit">
+            <button type="submit" disabled={isSubmitting}>
                 {t("auth.register")}
             </button>
 

@@ -14,39 +14,52 @@ function DashboardSection({accessToken}: DashboardSectionProps) {
     const totalBalance = accountBalances.reduce(
         (sum, accountBalance) => sum + accountBalance.balance, 0)
     const { t } = useTranslation()
+    const [monthlyLoading, setMonthlyLoading] = useState(true)
+    const [balancesLoading, setBalancesLoading] = useState(true)
+
+    const [monthlyError, setMonthlyError] = useState<string | null>(null)
+    const [balancesError, setBalancesError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
 
-        const now = new Date()
-        const year = now.getFullYear()
-        const month = now.getMonth() + 1
+        async function loadMonthlyStats() {
+            setMonthlyLoading(true)
+            setMonthlyError(null)
 
-        fetch(
-            `http://localhost:8080/stats/monthly?year=${year}&month=${month}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+            const now = new Date()
+            const year = now.getFullYear()
+            const month = now.getMonth() + 1
+
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/stats/monthly?year=${year}&month=${month}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(
-                        `Failed to load monthly stats: ${response.status}`
-                    )
+                    setMonthlyError(t("dashboard.loadError"))
+                    return
                 }
 
-                return response.json()
-            })
-            .then(data => {
+                const data = await response.json()
                 setMonthlyStats(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load monthly stats:", error)
-            })
+                setMonthlyError(t("dashboard.loadError"))
+
+            } finally {
+                setMonthlyLoading(false)
+            }
+        }
+        void loadMonthlyStats()
 
     }, [accessToken])
 
@@ -55,32 +68,61 @@ function DashboardSection({accessToken}: DashboardSectionProps) {
             return
         }
 
-        fetch(
-            "http://localhost:8080/stats/accounts/balances",
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+        async function loadAccountBalances() {
+            setBalancesLoading(true)
+            setBalancesError(null)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/stats/accounts/balances",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(
-                        `Failed to load account balances: ${response.status}`
-                    )
+                    setBalancesError(t("dashboard.loadError"))
+                    return
                 }
 
-                return response.json()
-            })
-            .then(data => {
+                const data = await response.json()
                 setAccountBalances(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load account balances:", error)
-            })
+                setBalancesError(t("dashboard.loadError"))
+
+            } finally {
+                setBalancesLoading(false)
+            }
+        }
+
+        void loadAccountBalances()
 
     }, [accessToken])
 
+    const isLoading = monthlyLoading || balancesLoading
+    const loadError = monthlyError || balancesError
+
+    if (isLoading) {
+        return (
+            <section>
+                <h2>{t("dashboard.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (loadError) {
+        return (
+            <section>
+                <h2>{t("dashboard.title")}</h2>
+                <p>{loadError}</p>
+            </section>
+        )
+    }
     return (
         <section>
             <h2>{t("dashboard.title")}</h2>

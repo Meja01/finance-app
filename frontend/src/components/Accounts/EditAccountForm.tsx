@@ -9,7 +9,7 @@ type EditAccountFormProps = {
         name: string,
         type: "CARD" | "CASH",
         initialBalance: number
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -22,14 +22,16 @@ function EditAccountForm({ account, onUpdate, onCancel }: EditAccountFormProps) 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onUpdate(
+        const success = await onUpdate(
             account.id,
             name,
             type,
             Number(initialBalance)
         )
 
-        onCancel()
+        if (success) {
+            onCancel()
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

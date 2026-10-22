@@ -6,7 +6,7 @@ type CreateAccountFormProps = {
         name: string,
         type: "CARD" | "CASH",
         initialBalance: number
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -19,15 +19,17 @@ function CreateAccountForm({ onCreate, onCancel }: CreateAccountFormProps) {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onCreate(
+        const success = await onCreate(
             name,
             type,
             Number(initialBalance)
         )
 
-        setName("")
-        setType("CARD")
-        setInitialBalance("")
+        if (success) {
+            setName("")
+            setType("CARD")
+            setInitialBalance("")
+        }
     }
 
     return (

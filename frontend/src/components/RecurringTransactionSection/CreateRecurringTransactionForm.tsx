@@ -16,7 +16,7 @@ type CreateRecurringTransactionFormProps = {
         frequency: "WEEKLY" | "MONTHLY" | "YEARLY",
         startDate: string,
         endDate: string | null
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -36,7 +36,7 @@ function CreateRecurringTransactionForm({accounts, categories, onCreate, onCance
     ) {
         event.preventDefault()
 
-        await onCreate(
+        const success = await onCreate(
             accountId,
             categoryId,
             Number(amount),
@@ -47,14 +47,16 @@ function CreateRecurringTransactionForm({accounts, categories, onCreate, onCance
             endDate === "" ? null : endDate
         )
 
-        setAccountId("")
-        setCategoryId("")
-        setAmount("")
-        setType("EXPENSE")
-        setNote("")
-        setFrequency("MONTHLY")
-        setStartDate("")
-        setEndDate("")
+        if (success) {
+            setAccountId("")
+            setCategoryId("")
+            setAmount("")
+            setType("EXPENSE")
+            setNote("")
+            setFrequency("MONTHLY")
+            setStartDate("")
+            setEndDate("")
+        }
     }
 
     return (

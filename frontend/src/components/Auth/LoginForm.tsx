@@ -7,6 +7,7 @@ type LoginFormProps = {
     setPassword: (value: string) => void
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
     onSwitchToRegister: () => void
+    isSubmitting: boolean
 }
 
 function LoginForm({
@@ -15,7 +16,8 @@ function LoginForm({
    setEmail,
    setPassword,
    onSubmit,
-   onSwitchToRegister
+   onSwitchToRegister,
+   isSubmitting
 }: LoginFormProps) {
     const { t } = useTranslation()
     return (
@@ -36,7 +38,7 @@ function LoginForm({
                 autoComplete="current-password"
             />
 
-            <button type="submit">
+            <button type="submit" disabled={isSubmitting}>
                 {t("auth.login")}
             </button>
 

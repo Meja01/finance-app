@@ -17,7 +17,7 @@ type EditTransactionFormProps = {
         dateTime: string,
         note: string | null,
         transactionType: "INCOME" | "EXPENSE"
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -33,7 +33,7 @@ function EditTransactionForm({transaction, categories, accounts, onUpdate, onCan
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onUpdate(
+        const success = await onUpdate(
             transaction.id,
             accountId,
             categoryId,
@@ -42,8 +42,9 @@ function EditTransactionForm({transaction, categories, accounts, onUpdate, onCan
             note,
             transactionType
         )
-
-        onCancel()
+        if (success) {
+            onCancel()
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

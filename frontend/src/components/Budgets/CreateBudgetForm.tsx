@@ -10,7 +10,7 @@ export type CreateBudgetFormProps = {
         year: number,
         month: number,
         amount: number
-    ) => Promise<void>,
+    ) => Promise<boolean>,
     onCancel: () => void
 }
 
@@ -25,17 +25,19 @@ function CreateBudgetForm({categories, onCreate, onCancel}:CreateBudgetFormProps
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onCreate(
+        const success = await onCreate(
             categoryId,
             Number(year),
             Number(month),
             Number(amount)
         )
 
-        setCategoryId("")
-        setYear("")
-        setMonth("")
-        setAmount("")
+        if (success) {
+            setCategoryId("")
+            setYear("")
+            setMonth("")
+            setAmount("")
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

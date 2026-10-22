@@ -5,7 +5,7 @@ type CreateCategoryFormProps = {
     onCreate: (
         name: string,
         type: "EXPENSE" | "INCOME"
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 function CreateCategoryForm({onCreate, onCancel} : CreateCategoryFormProps) {
@@ -16,13 +16,15 @@ function CreateCategoryForm({onCreate, onCancel} : CreateCategoryFormProps) {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onCreate(
+        const success = await onCreate(
             name,
             type
         )
 
-        setName("")
-        setType("EXPENSE")
+        if (success) {
+            setName("")
+            setType("EXPENSE")
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

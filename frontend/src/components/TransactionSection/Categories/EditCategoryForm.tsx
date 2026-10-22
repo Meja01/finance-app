@@ -7,7 +7,7 @@ type EditCategoryFormProps = {
     onUpdate: (
         categoryId: string,
         name: string,
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 function EditCategoryForm({category, onUpdate, onCancel} : EditCategoryFormProps) {
@@ -17,11 +17,13 @@ function EditCategoryForm({category, onUpdate, onCancel} : EditCategoryFormProps
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onUpdate(
+        const success = await onUpdate(
             category.id,
             name
         )
-        onCancel()
+        if (success) {
+            onCancel()
+        }
     }
     return (
         <form onSubmit={handleSubmit}>

@@ -18,7 +18,7 @@ type EditRecurringTransactionFormProps = {
         type: "INCOME" | "EXPENSE",
         frequency: "WEEKLY" | "MONTHLY" | "YEARLY",
         endDate: string | null
-    ) => Promise<void>
+    ) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -37,7 +37,7 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
     ) {
         event.preventDefault()
 
-        await onUpdate(
+        const success = await onUpdate(
             recurringTransaction.id,
             accountId,
             categoryId,
@@ -48,7 +48,9 @@ function EditRecurringTransactionForm({recurringTransaction, accounts, categorie
             endDate === "" ? null : endDate
         )
 
-        onCancel()
+        if (success) {
+            onCancel()
+        }
     }
 
     return (

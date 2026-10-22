@@ -31,61 +31,116 @@ function App() {
     const [currentPage, setCurrentPage] = useState<Page>("dashboard")
 
     const { t, i18n } = useTranslation()
+    const [accountsError, setAccountsError] = useState<string | null>(null)
+    const [categoriesError, setCategoriesError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
-        fetch("http://localhost:8080/accounts", {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
+
+        async function loadAccounts() {
+            setAccountsLoaded(false)
+            setAccountsError(null)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/accounts",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
+                if (!response.ok) {
+                    setAccountsError(t("accounts.loadError"))
+                    return
+                }
+
+                const data = await response.json()
                 setAccounts(data)
-                setAccountsLoaded(true)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load accounts:", error)
-            })
+                setAccountsError(t("accounts.loadError"))
+
+            } finally {
+                setAccountsLoaded(true)
+            }
+        }
+        void loadAccounts()
     }, [accessToken])
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
-        fetch("http://localhost:8080/categories", {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
+
+        async function loadCategories() {
+            setCategoriesLoaded(false)
+            setCategoriesError(null)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/categories",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
+                if (!response.ok) {
+                    setCategoriesError(t("transactions.categories.loadError"))
+                    return
+                }
+
+                const data = await response.json()
                 setCategories(data)
-                setCategoriesLoaded(true)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load categories:", error)
-            })
+                setCategoriesError(t("transactions.categories.loadError"))
+            } finally {
+                setCategoriesLoaded(true)
+            }
+        }
+        void loadCategories()
     }, [accessToken])
 
     async function handleLogout() {
-        await fetch("http://localhost:8080/users/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken
-            })
-        })
+        try {
+            const response = await fetch(
+                "http://localhost:8080/users/logout",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        refreshToken
+                    })
+                }
+            )
 
-        setAccessToken("")
-        setRefreshToken("")
-        setCurrentPage("dashboard")
+            if (!response.ok) {
+                console.error(`Logout request failed: ${response.status}`)
+            }
+
+        } catch (error) {
+            console.error("Logout request failed:", error)
+        } finally {
+            setAccessToken("")
+            setRefreshToken("")
+            setAccounts([])
+            setCategories([])
+            setAccountsLoaded(false)
+            setCategoriesLoaded(false)
+            setAccountsError(null)
+            setCategoriesError(null)
+            setCurrentPage("dashboard")
+        }
     }
 
     function handleLoginSuccess(
@@ -161,6 +216,8 @@ function App() {
                         accessToken={accessToken}
                         accounts={accounts}
                         setAccounts={setAccounts}
+                        accountsLoaded={accountsLoaded}
+                        accountsError={accountsError}
                     />
                 )}
 
@@ -172,6 +229,8 @@ function App() {
                         categories={categories}
                         categoriesLoaded={categoriesLoaded}
                         setCategories={setCategories}
+                        categoriesError={categoriesError}
+                        accountsError={accountsError}
                     />
                 )}
 
@@ -180,6 +239,7 @@ function App() {
                         accessToken={accessToken}
                         categories={categories}
                         categoriesLoaded={categoriesLoaded}
+                        categoriesError={categoriesError}
                     />
                 )}
 
@@ -190,6 +250,8 @@ function App() {
                         accountsLoaded={accountsLoaded}
                         categories={categories}
                         categoriesLoaded={categoriesLoaded}
+                        categoriesError={categoriesError}
+                        accountsError={accountsError}
                     />
                 )}
 

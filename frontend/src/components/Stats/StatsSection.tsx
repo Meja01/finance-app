@@ -20,32 +20,50 @@ function StatsSection({ accessToken }: StatsSectionProps) {
     const [categoryStatsType, setCategoryStatsType] = useState<"INCOME" | "EXPENSE">("EXPENSE")
     const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([])
     const { t } = useTranslation()
+    const [monthlyLoading, setMonthlyLoading] = useState(true)
+    const [categoryLoading, setCategoryLoading] = useState(true)
+    const [balancesLoading, setBalancesLoading] = useState(true)
+    const [monthlyError, setMonthlyError] = useState<string | null>(null)
+    const [categoryError, setCategoryError] = useState<string | null>(null)
+    const [balancesError, setBalancesError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
 
-        fetch(
-            `http://localhost:8080/stats/monthly?year=${selectedYear}&month=${selectedMonth}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+        async function loadMonthlyStats() {
+            setMonthlyLoading(true)
+            setMonthlyError(null)
+
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/stats/monthly?year=${selectedYear}&month=${selectedMonth}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(`Failed to load monthly stats: ${response.status}`)
+                    setMonthlyError(t("statistics.loadError"))
+                    return
                 }
-                return response.json()
-            })
-            .then(data => {
+
+                const data = await response.json()
                 setMonthlyStats(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load monthly stats:", error)
-            })
+                setMonthlyError(t("statistics.loadError"))
+
+            } finally {
+                setMonthlyLoading(false)
+            }
+        }
+
+        void loadMonthlyStats()
 
     }, [accessToken, selectedYear, selectedMonth])
 
@@ -54,57 +72,99 @@ function StatsSection({ accessToken }: StatsSectionProps) {
             return
         }
 
-        fetch(
-            `http://localhost:8080/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+        async function loadCategoryStats() {
+            setCategoryLoading(true)
+            setCategoryError(null)
+
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(`Failed to load category stats: ${response.status}`)
+                    setCategoryError(t("statistics.loadError"))
+                    return
                 }
-                return response.json()
-            })
-            .then(data => {setCategoryStats(data)})
-            .catch(error => {console.error("Failed to load category stats:", error)})
-    }, [
-        accessToken,
-        selectedYear,
-        selectedMonth,
-        categoryStatsType
-    ])
+
+                const data = await response.json()
+                setCategoryStats(data)
+
+            } catch (error) {
+                console.error("Failed to load category stats:", error)
+                setCategoryError(t("statistics.loadError"))
+
+            } finally {
+                setCategoryLoading(false)
+            }
+        }
+        void loadCategoryStats()
+    }, [accessToken, selectedYear, selectedMonth, categoryStatsType])
 
     useEffect(() => {
         if (!accessToken) {
             return
         }
 
-        fetch(
-            "http://localhost:8080/stats/accounts/balances",
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        )
-            .then(response => {
+        async function loadAccountBalances() {
+            setBalancesLoading(true)
+            setBalancesError(null)
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/stats/accounts/balances",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    }
+                )
+
                 if (!response.ok) {
-                    throw new Error(`Failed to load account balances: ${response.status}`)
+                    setBalancesError(t("statistics.loadError"))
+                    return
                 }
 
-                return response.json()
-            })
-            .then(data => {
+                const data = await response.json()
                 setAccountBalances(data)
-            })
-            .catch(error => {
+
+            } catch (error) {
                 console.error("Failed to load account balances:", error)
-            })
+                setBalancesError(t("statistics.loadError"))
+
+            } finally {
+                setBalancesLoading(false)
+            }
+        }
+
+        void loadAccountBalances()
 
     }, [accessToken])
+
+    const isLoading = monthlyLoading || categoryLoading || balancesLoading
+    const loadError = monthlyError || categoryError || balancesError
+
+    if (isLoading) {
+        return (
+            <section>
+                <h2>{t("statistics.title")}</h2>
+                <p>{t("common.loading")}</p>
+            </section>
+        )
+    }
+
+    if (loadError) {
+        return (
+            <section>
+                <h2>{t("statistics.title")}</h2>
+                <p>{loadError}</p>
+            </section>
+        )
+    }
 
     return (
         <section>

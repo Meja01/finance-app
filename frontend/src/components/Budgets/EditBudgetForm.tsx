@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 
 export type EditBudgetFormProps = {
     budget: Budget,
-    onUpdate: (budgetId: string, amount: number) => Promise<void>
+    onUpdate: (budgetId: string, amount: number) => Promise<boolean>
     onCancel: () => void
 }
 
@@ -15,12 +15,14 @@ function EditBudgetForm({budget, onUpdate, onCancel} : EditBudgetFormProps) {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        await onUpdate(
+        const success = await onUpdate(
             budget.id,
             Number(amount)
         )
 
-        onCancel()
+        if (success) {
+            onCancel()
+        }
     }
 
     return (<form onSubmit={handleSubmit}>
