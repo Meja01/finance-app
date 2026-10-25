@@ -1,16 +1,25 @@
 import type { AccountBalance } from "../../types/AccountBalance"
 import {useTranslation} from "react-i18next";
+import {formatCurrency} from "../utils/formatCurrency.ts";
 
 type AccountBalanceItemProps = {
     accountBalance: AccountBalance
 }
 
 function AccountBalanceItem({accountBalance}: AccountBalanceItemProps) {
-    const { t } = useTranslation()
+    const { i18n } = useTranslation()
     return (
-        <div>
-            <p>{t("statistics.account")}: {accountBalance.accountName}</p>
-            <p>{t("statistics.balance")}: {accountBalance.balance}</p>
+        <div className="card account-balance-item">
+            <span className="account-balance-name">
+              {accountBalance.accountName}
+            </span>
+
+            <strong className="account-balance-value">
+                {formatCurrency(
+                    accountBalance.balance,
+                    i18n.language
+                )}
+            </strong>
         </div>
     )
 }

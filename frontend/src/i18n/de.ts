@@ -9,7 +9,8 @@ export const de = {
             budgets: "Budgets",
             recurring: "Wiederkehrende Transaktionen",
             statistics: "Statistiken",
-            logout: "Abmelden"
+            logout: "Abmelden",
+            categories: "Kategorien"
         },
 
         common: {
@@ -83,7 +84,8 @@ export const de = {
                 name: "Name",
                 create: "Kategorie erstellen",
                 edit: "Kategorie bearbeiten",
-                loadError: "Kategorien konnten nicht geladen werden."
+                loadError: "Kategorien konnten nicht geladen werden.",
+                update: "Kategorie aktualisieren"
             },
             type: "Typ",
             amount: "Betrag",
@@ -96,7 +98,24 @@ export const de = {
             edit: "Transaktion bearbeiten",
             loadError: "Transaktionen konnten nicht geladen werden.",
             empty: "Keine Transaktionen gefunden.",
-            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+            actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+            from: "Ab",
+            to: "Bis",
+            update: "Transaktion aktualisieren"
+        },
+
+        statistics: {
+            title: "Statistiken",
+            period: "Zeitraum",
+            monthly: "Monatliche Statistiken",
+            categories: "Kategoriestatistiken",
+            accountBalances: "Kontostände",
+            expenses: "Ausgaben",
+            balance: "Saldo",
+            category: "Kategorie",
+            amount: "Betrag",
+            account: "Konto",
+            loadError: "Statistiken konnten nicht geladen werden."
         },
 
         budgets: {
@@ -118,21 +137,9 @@ export const de = {
             progressLoadError: "Budgetfortschritt konnte nicht geladen werden.",
             actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
             empty: "Noch keine Budgets vorhanden.",
-            progressEmpty: "Für diesen Zeitraum ist kein Budgetfortschritt verfügbar."
-        },
-
-        statistics: {
-            title: "Statistiken",
-            period: "Zeitraum",
-            monthly: "Monatliche Statistiken",
-            categories: "Kategoriestatistiken",
-            accountBalances: "Kontostände",
-            expenses: "Ausgaben",
-            balance: "Saldo",
-            category: "Kategorie",
-            amount: "Betrag",
-            account: "Konto",
-            loadError: "Statistiken konnten nicht geladen werden."
+            progressEmpty: "Für diesen Zeitraum ist kein Budgetfortschritt verfügbar.",
+            list: "Budgets",
+            update: "Budget aktualisieren"
         },
 
         recurring: {
@@ -163,7 +170,9 @@ export const de = {
             title: "Übersicht",
             totalBalance: "Gesamtsaldo",
             thisMonth: "Dieser Monat",
-            loadError: "Dashboard-Daten konnten nicht geladen werden."
+            loadError: "Dashboard-Daten konnten nicht geladen werden.",
+            expensesByCategory: "Ausgaben nach Kategorie",
+            noCategoryExpenses: "Für diesen Monat wurden keine Ausgaben erfasst."
         },
 
         categories: {
@@ -180,6 +189,8 @@ export const de = {
                 health: "Gesundheit",
                 apparel: "Kleidung"
             },
+            title: "Kategorien",
+            globalLabel: "Global",
             actionError: "Etwas ist schiefgelaufen. Bitte versuche es erneut."
         }
     }

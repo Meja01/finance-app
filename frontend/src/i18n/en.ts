@@ -9,7 +9,8 @@ export const en = {
             budgets: "Budgets",
             recurring: "Recurring Transactions",
             statistics: "Statistics",
-            logout: "Logout"
+            logout: "Logout",
+            categories: "Categories"
         },
 
         common: {
@@ -83,7 +84,8 @@ export const en = {
                 name: "Name",
                 create: "Create category",
                 edit: "Edit category",
-                loadError: "Failed to load categories."
+                loadError: "Failed to load categories.",
+                update: "Update category"
             },
             type: "Type",
             amount: "Amount",
@@ -96,7 +98,10 @@ export const en = {
             edit: "Edit transaction",
             loadError: "Failed to load transactions.",
             empty: "No transactions found.",
-            actionError: "Something went wrong. Please try again."
+            actionError: "Something went wrong. Please try again.",
+            from: "From",
+            to: "To",
+            update: "Update Transaction"
         },
 
         budgets: {
@@ -118,7 +123,9 @@ export const en = {
             progressLoadError: "Failed to load budget progress.",
             actionError: "Something went wrong. Please try again.",
             empty: "No budgets yet.",
-            progressEmpty: "No budget progress available for this period."
+            progressEmpty: "No budget progress available for this period.",
+            list: "Budgets",
+            update: "Update budget"
         },
 
         statistics: {
@@ -163,7 +170,9 @@ export const en = {
             title: "Dashboard",
             totalBalance: "Total balance",
             thisMonth: "This month",
-            loadError: "Failed to load dashboard data."
+            loadError: "Failed to load dashboard data.",
+            expensesByCategory: "Expenses by category",
+            noCategoryExpenses: "No expenses recorded for this month."
         },
 
         categories: {
@@ -180,7 +189,11 @@ export const en = {
                 health: "Health",
                 apparel: "Apparel"
             },
-            actionError: "Something went wrong. Please try again."
+            title: "Categories",
+            globalLabel: "Global",
+            actionError: "Something went wrong. Please try again.",
+            create: "Create category",
+            update: "Update category"
         }
     }
 }

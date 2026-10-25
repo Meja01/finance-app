@@ -9,20 +9,28 @@ import type {Category} from "./types/Category.ts";
 import RecurringTransactionSection from "./components/RecurringTransactionSection/RecurringTransactionSection.tsx";
 import StatsSection from "./components/Stats/StatsSection.tsx";
 import DashboardSection from "./components/Dashboard/DashboardSection.tsx";
-import { useTranslation } from "react-i18next"
+import {useTranslation} from "react-i18next"
+import {useAuth} from "./auth/useAuth.ts";
+import CategorySection from "./components/Categories/CategorySection.tsx";
 
 type Page =
     | "dashboard"
     | "accounts"
     | "transactions"
+    | "categories"
     | "budgets"
     | "recurring"
     | "statistics"
 
 function App() {
-    const [accessToken, setAccessToken] = useState("")
-    const [refreshToken, setRefreshToken] = useState("")
-    const isAuthenticated = accessToken !== ""
+    const {
+        accessToken,
+        isAuthenticated,
+        authInitializing,
+        handleLogout,
+        apiFetch
+    } = useAuth()
+
     const [accounts, setAccounts] = useState<Account[]>([])
     const [accountsLoaded, setAccountsLoaded] = useState(false)
     const [categories, setCategories] = useState<Category[]>([])
@@ -44,14 +52,7 @@ function App() {
             setAccountsError(null)
 
             try {
-                const response = await fetch(
-                    "http://localhost:8080/accounts",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch("http://localhost:8080/accounts")
 
                 if (!response.ok) {
                     setAccountsError(t("accounts.loadError"))
@@ -82,14 +83,7 @@ function App() {
             setCategoriesError(null)
 
             try {
-                const response = await fetch(
-                    "http://localhost:8080/categories",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch("http://localhost:8080/categories")
 
                 if (!response.ok) {
                     setCategoriesError(t("transactions.categories.loadError"))
@@ -109,159 +103,138 @@ function App() {
         void loadCategories()
     }, [accessToken])
 
-    async function handleLogout() {
-        try {
-            const response = await fetch(
-                "http://localhost:8080/users/logout",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        refreshToken
-                    })
-                }
-            )
-
-            if (!response.ok) {
-                console.error(`Logout request failed: ${response.status}`)
-            }
-
-        } catch (error) {
-            console.error("Logout request failed:", error)
-        } finally {
-            setAccessToken("")
-            setRefreshToken("")
-            setAccounts([])
-            setCategories([])
-            setAccountsLoaded(false)
-            setCategoriesLoaded(false)
-            setAccountsError(null)
-            setCategoriesError(null)
-            setCurrentPage("dashboard")
-        }
+    if (authInitializing) {
+        return (
+            <p>{t("common.loading")}</p>
+        )
     }
 
-    function handleLoginSuccess(
-        accessToken: string,
-        refreshToken: string
-    ) {
-        setAccessToken(accessToken)
-        setRefreshToken(refreshToken)
-    }
-
-
-    return (
-        <div>
-            <header>
-                <h1>{t("appTitle")}</h1>
-
+    return (<div className="app-shell">
                 {isAuthenticated && (
-                    <nav>
-                        <button onClick={() => setCurrentPage("dashboard")}>
-                            {t("navigation.dashboard")}
-                        </button>
+                    <aside className="sidebar">
+                        <div className="sidebar-header">
+                            <h1>{t("appTitle")}</h1>
+                        </div>
 
-                        <button onClick={() => setCurrentPage("accounts")}>
-                            {t("navigation.accounts")}
-                        </button>
+                        <nav className="sidebar-nav">
+                            <button className={currentPage === "dashboard" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("dashboard")}>
+                                {t("navigation.dashboard")}
+                            </button>
 
-                        <button onClick={() => setCurrentPage("transactions")}>
-                            {t("navigation.transactions")}
-                        </button>
+                            <button className={currentPage === "accounts" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("accounts")}>
+                                {t("navigation.accounts")}
+                            </button>
 
-                        <button onClick={() => setCurrentPage("budgets")}>
-                            {t("navigation.budgets")}
-                        </button>
+                            <button className={currentPage === "transactions" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("transactions")}>
+                                {t("navigation.transactions")}
+                            </button>
 
-                        <button onClick={() => setCurrentPage("recurring")}>
-                            {t("navigation.recurring")}
-                        </button>
+                            <button className={currentPage === "categories" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("categories")}>
+                                {t("navigation.categories")}
+                            </button>
 
-                        <button onClick={() => setCurrentPage("statistics")}>
-                            {t("navigation.statistics")}
-                        </button>
+                            <button className={currentPage === "budgets" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("budgets")}>
+                                {t("navigation.budgets")}
+                            </button>
 
-                        <select
-                            value={i18n.language}
-                            onChange={event =>
-                                i18n.changeLanguage(event.target.value)
-                            }
-                        >
-                            <option value="en">English</option>
-                            <option value="de">Deutsch</option>
-                        </select>
+                            <button className={currentPage === "recurring" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("recurring")}>
+                                {t("navigation.recurring")}
+                            </button>
 
-                        <button onClick={handleLogout}>
-                            {t("navigation.logout")}
-                        </button>
-                    </nav>
-                )}
-            </header>
+                            <button className={currentPage === "statistics" ? "nav-item active" : "nav-item"}
+                                onClick={() => setCurrentPage("statistics")}>
+                                {t("navigation.statistics")}
+                            </button>
+                        </nav>
 
-            <main>
-                {!isAuthenticated && (
-                    <AuthSection
-                        onLoginSuccess={handleLoginSuccess}
-                    />
-                )}
+                        <div className="sidebar-footer">
+                            <select
+                                value={i18n.language}
+                                onChange={event =>
+                                    i18n.changeLanguage(event.target.value)
+                                }
+                            >
+                                <option value="en">English</option>
+                                <option value="de">Deutsch</option>
+                            </select>
 
-                {isAuthenticated && currentPage === "dashboard" && (
-                    <DashboardSection accessToken={accessToken} />
-                )}
-
-                {isAuthenticated && currentPage === "accounts" && (
-                    <AccountSection
-                        accessToken={accessToken}
-                        accounts={accounts}
-                        setAccounts={setAccounts}
-                        accountsLoaded={accountsLoaded}
-                        accountsError={accountsError}
-                    />
+                            <button onClick={handleLogout}>
+                                {t("navigation.logout")}
+                            </button>
+                        </div>
+                    </aside>
                 )}
 
-                {isAuthenticated && currentPage === "transactions" && (
-                    <TransactionSection
-                        accessToken={accessToken}
-                        accounts={accounts}
-                        accountsLoaded={accountsLoaded}
-                        categories={categories}
-                        categoriesLoaded={categoriesLoaded}
-                        setCategories={setCategories}
-                        categoriesError={categoriesError}
-                        accountsError={accountsError}
-                    />
-                )}
+                <main className="main-content">
+                    <div className="content-container">
+                        {!isAuthenticated && (
+                            <AuthSection/>
+                        )}
 
-                {isAuthenticated && currentPage === "budgets" && (
-                    <BudgetSection
-                        accessToken={accessToken}
-                        categories={categories}
-                        categoriesLoaded={categoriesLoaded}
-                        categoriesError={categoriesError}
-                    />
-                )}
+                        {isAuthenticated && currentPage === "dashboard" && (
+                            <DashboardSection/>
+                        )}
 
-                {isAuthenticated && currentPage === "recurring" && (
-                    <RecurringTransactionSection
-                        accessToken={accessToken}
-                        accounts={accounts}
-                        accountsLoaded={accountsLoaded}
-                        categories={categories}
-                        categoriesLoaded={categoriesLoaded}
-                        categoriesError={categoriesError}
-                        accountsError={accountsError}
-                    />
-                )}
+                        {isAuthenticated && currentPage === "accounts" && (
+                            <AccountSection
+                                accounts={accounts}
+                                setAccounts={setAccounts}
+                                accountsLoaded={accountsLoaded}
+                                accountsError={accountsError}
+                            />
+                        )}
 
-                {isAuthenticated && currentPage === "statistics" && (
-                    <StatsSection
-                        accessToken={accessToken}
-                    />
-                )}
-            </main>
-        </div>
+                        {isAuthenticated && currentPage === "transactions" && (
+                            <TransactionSection
+                                accounts={accounts}
+                                accountsLoaded={accountsLoaded}
+                                categories={categories}
+                                categoriesLoaded={categoriesLoaded}
+                                categoriesError={categoriesError}
+                                accountsError={accountsError}
+                            />
+                        )}
+
+                        {isAuthenticated && currentPage === "categories" && (
+                            <CategorySection
+                                categories={categories}
+                                setCategories={setCategories}
+                                categoriesLoaded={categoriesLoaded}
+                                categoriesError={categoriesError}
+                            />
+                        )}
+
+                        {isAuthenticated && currentPage === "budgets" && (
+                            <BudgetSection
+                                categories={categories}
+                                categoriesLoaded={categoriesLoaded}
+                                categoriesError={categoriesError}
+                            />
+                        )}
+
+                        {isAuthenticated && currentPage === "recurring" && (
+                            <RecurringTransactionSection
+                                accounts={accounts}
+                                accountsLoaded={accountsLoaded}
+                                categories={categories}
+                                categoriesLoaded={categoriesLoaded}
+                                categoriesError={categoriesError}
+                                accountsError={accountsError}
+                            />
+                        )}
+
+                        {isAuthenticated && currentPage === "statistics" && (
+                            <StatsSection/>
+                        )}
+                    </div>
+                </main>
+            </div>
     )
 }
 

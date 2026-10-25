@@ -1,5 +1,6 @@
 package org.example.finance.users.infrastructure;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.finance.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,11 @@ public class SecurityConfiguration {
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/register", "/users/login", "/users/refresh", "/users/logout").permitAll()

@@ -60,117 +60,198 @@ function CreateRecurringTransactionForm({accounts, categories, onCreate, onCance
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <select
-                value={accountId}
-                onChange={event => setAccountId(event.target.value)}
-                required
-            >
-                <option value="">{t("recurring.selectAccount")}</option>
+        <form className="form" onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="recurring-account">
+                    {t("recurring.account")}
+                </label>
 
-                {accounts.map(account => (
-                    <option
-                        key={account.id}
-                        value={account.id}
-                    >
-                        {account.name}
+                <select
+                    id="recurring-account"
+                    className="form-control"
+                    value={accountId}
+                    onChange={event => setAccountId(event.target.value)}
+                    required
+                >
+                    <option value="">
+                        {t("recurring.selectAccount")}
                     </option>
-                ))}
-            </select>
 
-            <select
-                value={type}
-                onChange={event => {
-                    setType(
-                        event.target.value as "INCOME" | "EXPENSE"
-                    )
-
-                    setCategoryId("")
-                }}
-            >
-                <option value="INCOME">{t("common.income")}</option>
-                <option value="EXPENSE">{t("common.expense")}</option>
-            </select>
-
-            <select
-                value={categoryId}
-                onChange={event => setCategoryId(event.target.value)}
-                required
-            >
-                <option value="">{t("recurring.selectCategory")}</option>
-
-                {categories
-                    .filter(category => category.type === type)
-                    .map(category => (
+                    {accounts.map(account => (
                         <option
-                            key={category.id}
-                            value={category.id}
+                            key={account.id}
+                            value={account.id}
                         >
-                            {getCategoryDisplayName(category, t)}
+                            {account.name}
                         </option>
                     ))}
-            </select>
+                </select>
+            </div>
 
-            <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder={t("recurring.amount")}
-                value={amount}
-                onChange={event => setAmount(event.target.value)}
-                required
-            />
+            <div className="form-group">
+                <label htmlFor="recurring-type">
+                    {t("recurring.type")}
+                </label>
 
-            <input
-                type="text"
-                placeholder={t("recurring.note")}
-                value={note}
-                onChange={event => setNote(event.target.value)}
-            />
+                <select
+                    id="recurring-type"
+                    className="form-control"
+                    value={type}
+                    onChange={event => {
+                        setType(
+                            event.target.value as "INCOME" | "EXPENSE"
+                        )
 
-            <select
-                value={frequency}
-                onChange={event =>
-                    setFrequency(
-                        event.target.value as
-                            | "WEEKLY"
-                            | "MONTHLY"
-                            | "YEARLY"
-                    )
-                }
-            >
-                <option value="WEEKLY">{t("recurring.weekly")}</option>
-                <option value="MONTHLY">{t("recurring.monthly")}</option>
-                <option value="YEARLY">{t("recurring.yearly")}</option>
-            </select>
+                        setCategoryId("")
+                    }}
+                >
+                    <option value="INCOME">
+                        {t("common.income")}
+                    </option>
 
-            <label>
-                {t("recurring.startDate")}
+                    <option value="EXPENSE">
+                        {t("common.expense")}
+                    </option>
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="recurring-category">
+                    {t("recurring.category")}
+                </label>
+
+                <select
+                    id="recurring-category"
+                    className="form-control"
+                    value={categoryId}
+                    onChange={event => setCategoryId(event.target.value)}
+                    required
+                >
+                    <option value="">
+                        {t("recurring.selectCategory")}
+                    </option>
+
+                    {categories
+                        .filter(category => category.type === type)
+                        .map(category => (
+                            <option
+                                key={category.id}
+                                value={category.id}
+                            >
+                                {getCategoryDisplayName(category, t)}
+                            </option>
+                        ))}
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="recurring-amount">
+                    {t("recurring.amount")}
+                </label>
+
                 <input
+                    id="recurring-amount"
+                    className="form-control"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={amount}
+                    onChange={event => setAmount(event.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="recurring-note">
+                    {t("recurring.note")}
+                </label>
+
+                <input
+                    id="recurring-note"
+                    className="form-control"
+                    type="text"
+                    value={note}
+                    onChange={event => setNote(event.target.value)}
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="recurring-frequency">
+                    {t("recurring.frequency")}
+                </label>
+
+                <select
+                    id="recurring-frequency"
+                    className="form-control"
+                    value={frequency}
+                    onChange={event =>
+                        setFrequency(
+                            event.target.value as
+                                | "WEEKLY"
+                                | "MONTHLY"
+                                | "YEARLY"
+                        )
+                    }
+                >
+                    <option value="WEEKLY">
+                        {t("recurring.weekly")}
+                    </option>
+
+                    <option value="MONTHLY">
+                        {t("recurring.monthly")}
+                    </option>
+
+                    <option value="YEARLY">
+                        {t("recurring.yearly")}
+                    </option>
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="recurring-start-date">
+                    {t("recurring.startDate")}
+                </label>
+
+                <input
+                    id="recurring-start-date"
+                    className="form-control"
                     type="date"
                     value={startDate}
                     onChange={event => setStartDate(event.target.value)}
                     required
                 />
-            </label>
+            </div>
 
-            <label>
-                {t("recurring.endDate")}
+            <div className="form-group">
+                <label htmlFor="recurring-end-date">
+                    {t("recurring.endDate")}
+                </label>
+
                 <input
+                    id="recurring-end-date"
+                    className="form-control"
                     type="date"
                     value={endDate}
                     onChange={event => setEndDate(event.target.value)}
                 />
-            </label>
+            </div>
 
-            <button type="submit">{t("recurring.create")}</button>
+            <div className="form-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                >
+                    {t("recurring.create")}
+                </button>
 
-            <button
-                type="button"
-                onClick={onCancel}
-            >
-                {t("common.cancel")}
-            </button>
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onCancel}
+                >
+                    {t("common.cancel")}
+                </button>
+            </div>
         </form>
     )
 }

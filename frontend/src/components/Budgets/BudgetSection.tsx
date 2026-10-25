@@ -9,15 +9,15 @@ import BudgetProgressItem from "./BudgetProgressItem.tsx";
 import PeriodSelector from "../common/PeriodSelector.tsx";
 import {useTranslation} from "react-i18next";
 import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
+import {useAuth} from "../../auth/useAuth.ts";
 
 type BudgetSectionProps = {
-    accessToken: string,
     categories: Category[]
     categoriesLoaded: boolean,
     categoriesError: string | null
 }
 
-function BudgetSection({accessToken, categories, categoriesLoaded, categoriesError} : BudgetSectionProps) {
+function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetSectionProps) {
     const [budgets, setBudgets] = useState<Budget[]>([])
     const [showCreateBudget, setShowCreateBudget] = useState(false)
     const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
@@ -32,6 +32,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
     const [progressError, setProgressError] = useState<string | null>(null)
 
     const [actionError, setActionError] = useState<string | null>(null)
+    const {accessToken, apiFetch} = useAuth()
 
     useEffect(() => {
         if (!accessToken) {
@@ -43,14 +44,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
             setBudgetsError(null)
 
             try {
-                const response = await fetch(
-                    "http://localhost:8080/budgets",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch("http://localhost:8080/budgets")
 
                 if (!response.ok) {
                     setBudgetsError(t("budgets.loadError"))
@@ -83,14 +77,7 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
             setProgressError(null)
 
             try {
-                const response = await fetch(
-                    `http://localhost:8080/budgets/progress?year=${selectedYear}&month=${selectedMonth}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch(`http://localhost:8080/budgets/progress?year=${selectedYear}&month=${selectedMonth}`)
 
                 if (!response.ok) {
                     setProgressError(t("budgets.progressLoadError"))
@@ -122,13 +109,12 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
         setActionError(null)
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 "http://localhost:8080/budgets",
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         categoryId,
@@ -159,13 +145,10 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
     async function handleDeleteBudget(budgetId: string) {
         setActionError(null)
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `http://localhost:8080/budgets/${budgetId}`,
                 {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
+                    method: "DELETE"
                 }
             )
 
@@ -187,13 +170,12 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
         setActionError(null)
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `http://localhost:8080/budgets/${budgetId}`,
                 {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         amount
@@ -255,52 +237,63 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
         return (
             <section>
                 <h2>{t("budgets.title")}</h2>
-                <p>{loadError}</p>
+                <p className="error-message">
+                    {loadError}
+                </p>
             </section>
         )
     }
 
     return (
         <section>
-            <h2>{t("budgets.title")}</h2>
+            <div className="page-header">
+                <h2>{t("budgets.title")}</h2>
 
-            <div>
-                <button
-                    onClick={() => {
-                        setShowCreateBudget(true)
-                        setEditingBudget(null)
-                    }}
-                >
-                    {t("budgets.create")}
-                </button>
+                {!showCreateBudget && !editingBudget && (
+                    <button
+                        className="button button-primary"
+                        onClick={() => {
+                            setShowCreateBudget(true)
+                            setEditingBudget(null)
+                        }}
+                    >
+                        {t("budgets.create")}
+                    </button>
+                )}
             </div>
 
             {actionError && (
                 <p>{actionError}</p>
             )}
 
-            <div>
-                {showCreateBudget && (
+            {showCreateBudget && (
+                <div className="card form-card">
                     <CreateBudgetForm
                         onCreate={handleCreateBudget}
                         categories={categories}
                         onCancel={() => setShowCreateBudget(false)}
                     />
-                )}
+                </div>
+            )}
 
-                {editingBudget && (
+            {editingBudget && (
+                <div className="card form-card">
                     <EditBudgetForm
                         budget={editingBudget}
                         onUpdate={handleUpdateBudget}
                         onCancel={() => setEditingBudget(null)}
                     />
-                )}
-            </div>
+                </div>
+            )}
 
-            <div>
-                {budgets.length === 0 ? (
-                    <p>{t("budgets.empty")}</p>
-                ) : (budgets.map(budget => {
+            <div className="budget-list-section">
+                <h3>{t("budgets.list")}</h3>
+
+                <div className="budget-list">
+                    {budgets.length === 0 ? (
+                        <p>{t("budgets.empty")}</p>
+                    ) : (
+                        budgets.map(budget => {
                             const category = categories.find(
                                 category => category.id === budget.categoryId
                             )
@@ -321,13 +314,16 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
                                 />
                             )
                         })
-                )}
+                    )}
+                </div>
             </div>
 
-            <div>
-                <h3>{t("budgets.progress")}</h3>
+            <section className="budget-progress-section">
+                <div className="section-header">
+                    <h3>{t("budgets.progress")}</h3>
+                </div>
 
-                <div>
+                <div className="card budget-period">
                     <PeriodSelector
                         year={selectedYear}
                         month={selectedMonth}
@@ -336,18 +332,19 @@ function BudgetSection({accessToken, categories, categoriesLoaded, categoriesErr
                     />
                 </div>
 
-                <div>
+                <div className="budget-progress-list">
                     {budgetProgress.length === 0 ? (
                         <p>{t("budgets.progressEmpty")}</p>
-                    ) : (budgetProgress.map(progress => (
-                                <BudgetProgressItem
-                                    key={progress.budgetId}
-                                    progress={progress}
-                                />
-                            ))
+                    ) : (
+                        budgetProgress.map(progress => (
+                            <BudgetProgressItem
+                                key={progress.budgetId}
+                                progress={progress}
+                            />
+                        ))
                     )}
                 </div>
-            </div>
+            </section>
         </section>
     )
 }

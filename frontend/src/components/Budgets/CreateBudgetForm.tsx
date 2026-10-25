@@ -40,65 +40,102 @@ function CreateBudgetForm({categories, onCreate, onCancel}:CreateBudgetFormProps
         }
     }
     return (
-        <form onSubmit={handleSubmit}>
-            <select
-                value={categoryId}
-                onChange={event => setCategoryId(event.target.value)}
-                required
-            >
-                <option value="">{t("budgets.selectCategory")}</option>
+        <form className="form" onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="budget-category">
+                    {t("budgets.category")}
+                </label>
 
-                {categories
-                    .filter(category => category.type === "EXPENSE")
-                    .map(category => (
-                        <option
-                            key={category.id}
-                            value={category.id}
-                        >
-                            {getCategoryDisplayName(category, t)}
-                        </option>
-                    ))}
-            </select>
+                <select
+                    id="budget-category"
+                    className="form-control"
+                    value={categoryId}
+                    onChange={event => setCategoryId(event.target.value)}
+                    required
+                >
+                    <option value="">
+                        {t("budgets.selectCategory")}
+                    </option>
 
-            <input
-                type="number"
-                placeholder={t("budgets.year")}
-                value={year}
-                onChange={event => setYear(event.target.value)}
-                min="2000"
-                required
-            />
+                    {categories
+                        .filter(category => category.type === "EXPENSE")
+                        .map(category => (
+                            <option
+                                key={category.id}
+                                value={category.id}
+                            >
+                                {getCategoryDisplayName(category, t)}
+                            </option>
+                        ))}
+                </select>
+            </div>
 
-            <input
-                type="number"
-                placeholder={t("budgets.month")}
-                value={month}
-                onChange={event => setMonth(event.target.value)}
-                min="1"
-                max="12"
-                required
-            />
+            <div className="form-group">
+                <label htmlFor="budget-year">
+                    {t("budgets.year")}
+                </label>
 
-            <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder={t("budgets.amount")}
-                value={amount}
-                onChange={event => setAmount(event.target.value)}
-                required
-            />
+                <input
+                    id="budget-year"
+                    className="form-control"
+                    type="number"
+                    value={year}
+                    onChange={event => setYear(event.target.value)}
+                    min="2000"
+                    required
+                />
+            </div>
 
-            <button type="submit">
-                {t("budgets.create")}
-            </button>
+            <div className="form-group">
+                <label htmlFor="budget-month">
+                    {t("budgets.month")}
+                </label>
 
-            <button
-                type="button"
-                onClick={onCancel}
-            >
-                {t("common.cancel")}
-            </button>
+                <input
+                    id="budget-month"
+                    className="form-control"
+                    type="number"
+                    value={month}
+                    onChange={event => setMonth(event.target.value)}
+                    min="1"
+                    max="12"
+                    required
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="budget-amount">
+                    {t("budgets.amount")}
+                </label>
+
+                <input
+                    id="budget-amount"
+                    className="form-control"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={amount}
+                    onChange={event => setAmount(event.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="form-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                >
+                    {t("budgets.create")}
+                </button>
+
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onCancel}
+                >
+                    {t("common.cancel")}
+                </button>
+            </div>
         </form>
     )
 }

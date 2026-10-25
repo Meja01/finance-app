@@ -4,20 +4,21 @@ import CreateAccountForm from "./CreateAccountForm"
 import EditAccountForm from "./EditAccountForm"
 import AccountItem from "./AccountItem.tsx"
 import {useTranslation} from "react-i18next";
+import {useAuth} from "../../auth/useAuth.ts";
 
 type AccountSectionProps = {
-    accessToken: string,
     accounts: Account[],
     setAccounts: React.Dispatch<React.SetStateAction<Account[]>>,
     accountsLoaded: boolean
     accountsError: string | null
 }
 
-function AccountSection ({ accessToken, accounts, setAccounts, accountsLoaded, accountsError } : AccountSectionProps) {
+function AccountSection ({accounts, setAccounts, accountsLoaded, accountsError} : AccountSectionProps) {
     const [editingAccount, setEditingAccount] = useState<Account | null>(null)
     const [showCreateAccount, setShowCreateAccount] = useState(false)
     const { t } = useTranslation()
     const [actionError, setActionError] = useState<string | null>(null)
+    const {apiFetch} = useAuth()
 
     async function handleCreateAccount (
         name: string,
@@ -27,11 +28,10 @@ function AccountSection ({ accessToken, accounts, setAccounts, accountsLoaded, a
         setActionError(null)
 
         try {
-            const response = await fetch("http://localhost:8080/accounts", {
+            const response = await apiFetch("http://localhost:8080/accounts", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`
                 },
                 body: JSON.stringify({
                     name,
@@ -63,13 +63,10 @@ function AccountSection ({ accessToken, accounts, setAccounts, accountsLoaded, a
     ) {
         setActionError(null)
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `http://localhost:8080/accounts/${accountId}`,
                 {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
+                    method: "DELETE"
                 }
             )
 
@@ -97,11 +94,10 @@ function AccountSection ({ accessToken, accounts, setAccounts, accountsLoaded, a
         initialBalance: number): Promise<boolean> {
         setActionError(null)
         try {
-            const response = await fetch(`http://localhost:8080/accounts/${accountId}`, {
+            const response = await apiFetch(`http://localhost:8080/accounts/${accountId}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     accountId,
@@ -139,63 +135,71 @@ function AccountSection ({ accessToken, accounts, setAccounts, accountsLoaded, a
         return (
             <section>
                 <h2>{t("accounts.title")}</h2>
-                <p>{accountsError}</p>
+                <p className="error-message">
+                    {accountsError}
+                </p>
             </section>
         )
     }
 
     return (
-    <section>
-        <h2>{t("accounts.title")}</h2>
-        <div>
-            <button
-                onClick={() => {
-                    setActionError(null)
-                    setShowCreateAccount(true)
-                    setEditingAccount(null)
-                }}
-            >
-                {t("accounts.create")}
+        <section>
+            <div className="page-header">
+                <h2>{t("accounts.title")}</h2>
 
-            </button>
-        </div>
+                {!showCreateAccount && !editingAccount && (
+                    <button
+                        className="button button-primary"
+                        onClick={() => {
+                            setActionError(null)
+                            setShowCreateAccount(true)
+                            setEditingAccount(null)
+                        }}
+                    >
+                        {t("accounts.create")}
+                    </button>
+                )}
+            </div>
 
-        {actionError && (
-            <p>{actionError}</p>
-        )}
+            {actionError && (
+                <p>{actionError}</p>
+            )}
 
-        <div>
             {showCreateAccount && (
-                <CreateAccountForm
-                    onCreate={handleCreateAccount}
-                    onCancel={() => setShowCreateAccount(false)}
-                />
-            )}
-            {editingAccount && (
-                <EditAccountForm
-                    account={editingAccount}
-                    onUpdate={handleUpdateAccount}
-                    onCancel={() => setEditingAccount(null)}
-                />
-            )}
-        </div>
-
-        <div>
-            {accounts.length === 0 ? (
-                <p>{t("accounts.empty")}</p>
-            ) : (
-                accounts.map(account => (
-                    <AccountItem
-                        key={account.id}
-                        account={account}
-                        onDelete={handleDeleteAccount}
-                        onEdit={handleEditAccount}
-                        isEditing={editingAccount?.id === account.id}
+                <div className="card form-card">
+                    <CreateAccountForm
+                        onCreate={handleCreateAccount}
+                        onCancel={() => setShowCreateAccount(false)}
                     />
-                ))
+                </div>
             )}
-        </div>
-    </section>
+
+            {editingAccount && (
+                <div className="card form-card">
+                    <EditAccountForm
+                        account={editingAccount}
+                        onUpdate={handleUpdateAccount}
+                        onCancel={() => setEditingAccount(null)}
+                    />
+                </div>
+            )}
+
+            <div className="account-list">
+                {accounts.length === 0 ? (
+                    <p>{t("accounts.empty")}</p>
+                ) : (
+                    accounts.map(account => (
+                        <AccountItem
+                            key={account.id}
+                            account={account}
+                            onDelete={handleDeleteAccount}
+                            onEdit={handleEditAccount}
+                            isEditing={editingAccount?.id === account.id}
+                        />
+                    ))
+                )}
+            </div>
+        </section>
     )
 }
 

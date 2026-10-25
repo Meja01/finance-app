@@ -7,10 +7,10 @@ import CreateRecurringTransactionForm from "./CreateRecurringTransactionForm.tsx
 import EditRecurringTransactionForm from "./EditRecurringTransactionForm.tsx";
 import {useTranslation} from "react-i18next";
 import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
+import {useAuth} from "../../auth/useAuth.ts";
 
 
 type RecurringTransactionSectionProps = {
-    accessToken: string,
     accounts: Account[],
     accountsLoaded: boolean
     categories: Category[]
@@ -19,7 +19,7 @@ type RecurringTransactionSectionProps = {
     accountsError: string | null
 }
 
-function RecurringTransactionSection({accessToken, accounts, categories, accountsLoaded, categoriesLoaded, categoriesError, accountsError}: RecurringTransactionSectionProps) {
+function RecurringTransactionSection({accounts, categories, accountsLoaded, categoriesLoaded, categoriesError, accountsError}: RecurringTransactionSectionProps) {
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([])
     const [showCreateRecurringTransaction, setShowCreateRecurringTransaction] = useState(false)
     const [editingRecurringTransaction, setEditingRecurringTransaction] = useState<RecurringTransaction | null>(null)
@@ -27,6 +27,7 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
     const [isLoading, setIsLoading] = useState(true)
     const [loadError, setLoadError] = useState<string | null>(null)
     const [actionError, setActionError] = useState<string | null>(null)
+    const {accessToken, apiFetch} = useAuth()
 
     useEffect(() => {
         if (!accessToken) {
@@ -38,14 +39,7 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
             setLoadError(null)
 
             try {
-                const response = await fetch(
-                    "http://localhost:8080/recurring-transactions",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch("http://localhost:8080/recurring-transactions")
 
                 if (!response.ok) {
                     setLoadError(t("recurring.loadError"))
@@ -85,13 +79,12 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
         setActionError(null)
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 "http://localhost:8080/recurring-transactions",
                 {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         accountId,
@@ -136,13 +129,12 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
         setActionError(null)
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `http://localhost:8080/recurring-transactions/${recurringTransactionId}`,
                 {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         accountId,
@@ -189,13 +181,10 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
         setActionError(null)
 
         try {
-            const response = await fetch(
+            const response = await apiFetch(
                 `http://localhost:8080/recurring-transactions/${recurringTransactionId}`,
                 {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
+                    method: "DELETE"
                 }
             )
 
@@ -261,41 +250,48 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
         return (
             <section>
                 <h2>{t("recurring.title")}</h2>
-                <p>{loadError}</p>
+                <p className="error-message">
+                    {loadError}
+                </p>
             </section>
         )
     }
 
     return (
         <section>
-            <h2>{t("recurring.title")}</h2>
+            <div className="page-header">
+                <h2>{t("recurring.title")}</h2>
 
-            <div>
-                <button
-                    onClick={() => {
-                        setShowCreateRecurringTransaction(true)
-                        setEditingRecurringTransaction(null)
-                    }}
-                >
-                    {t("recurring.create")}
-                </button>
+                {!showCreateRecurringTransaction && !editingRecurringTransaction && (
+                    <button
+                        className="button button-primary"
+                        onClick={() => {
+                            setShowCreateRecurringTransaction(true)
+                            setEditingRecurringTransaction(null)
+                        }}
+                    >
+                        {t("recurring.create")}
+                    </button>
+                )}
             </div>
 
             {actionError && (
                 <p>{actionError}</p>
             )}
 
-            <div>
-                {showCreateRecurringTransaction && (
+            {showCreateRecurringTransaction && (
+                <div className="card form-card">
                     <CreateRecurringTransactionForm
                         accounts={accounts}
                         categories={categories}
                         onCreate={handleCreateRecurringTransaction}
                         onCancel={() => setShowCreateRecurringTransaction(false)}
                     />
-                )}
+                </div>
+            )}
 
-                {editingRecurringTransaction && (
+            {editingRecurringTransaction && (
+                <div className="card form-card">
                     <EditRecurringTransactionForm
                         recurringTransaction={editingRecurringTransaction}
                         accounts={accounts}
@@ -303,46 +299,48 @@ function RecurringTransactionSection({accessToken, accounts, categories, account
                         onUpdate={handleUpdateRecurringTransaction}
                         onCancel={() => setEditingRecurringTransaction(null)}
                     />
-                )}
-            </div>
+                </div>
+            )}
 
-            <div>
-                {recurringTransactions.length === 0 ? (
-                    <p>{t("recurring.empty")}</p>
-                ) : (
-                    recurringTransactions.map(recurringTransaction => {
-                        const account = accounts.find(
-                            account => account.id === recurringTransaction.accountId
-                        )
-
-                        if (!account) {
-                            throw new Error(
-                                `Account not found for recurring transaction ${recurringTransaction.id}`
+            <div className="recurring-list-section">
+                <div className="recurring-list">
+                    {recurringTransactions.length === 0 ? (
+                        <p>{t("recurring.empty")}</p>
+                    ) : (
+                        recurringTransactions.map(recurringTransaction => {
+                            const account = accounts.find(
+                                account => account.id === recurringTransaction.accountId
                             )
-                        }
 
-                        const category = categories.find(
-                            category => category.id === recurringTransaction.categoryId
-                        )
+                            if (!account) {
+                                throw new Error(
+                                    `Account not found for recurring transaction ${recurringTransaction.id}`
+                                )
+                            }
 
-                        if (!category) {
-                            throw new Error(
-                                `Category not found for recurring transaction ${recurringTransaction.id}`
+                            const category = categories.find(
+                                category => category.id === recurringTransaction.categoryId
                             )
-                        }
 
-                        return (
-                            <RecurringTransactionItem
-                                key={recurringTransaction.id}
-                                recurringTransaction={recurringTransaction}
-                                accountName={account.name}
-                                categoryName={getCategoryDisplayName(category, t)}
-                                onEdit={handleEditRecurringTransaction}
-                                onDeactivate={handleDeactivateRecurringTransaction}
-                            />
-                        )
-                    })
-                )}
+                            if (!category) {
+                                throw new Error(
+                                    `Category not found for recurring transaction ${recurringTransaction.id}`
+                                )
+                            }
+
+                            return (
+                                <RecurringTransactionItem
+                                    key={recurringTransaction.id}
+                                    recurringTransaction={recurringTransaction}
+                                    accountName={account.name}
+                                    categoryName={getCategoryDisplayName(category, t)}
+                                    onEdit={handleEditRecurringTransaction}
+                                    onDeactivate={handleDeactivateRecurringTransaction}
+                                />
+                            )
+                        })
+                    )}
+                </div>
             </div>
         </section>
     )

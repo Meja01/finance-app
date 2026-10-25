@@ -2,15 +2,10 @@ import {useState} from "react";
 import LoginForm from "./LoginForm.tsx";
 import RegisterForm from "./RegisterForm.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "../../auth/useAuth.ts";
 
-type AuthSectionProps = {
-    onLoginSuccess: (
-        accessToken: string,
-        refreshToken: string
-    ) => void
-}
 
-function AuthSection({ onLoginSuccess } : AuthSectionProps) {
+function AuthSection() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
@@ -18,6 +13,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
     const { t } = useTranslation()
     const [authError, setAuthError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const {handleLoginSuccess} = useAuth()
 
 
     async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
@@ -85,7 +81,7 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
                 return
             }
             const data = await response.json()
-            onLoginSuccess(data.accessToken, data.refreshToken)
+            handleLoginSuccess(data.accessToken, data.refreshToken)
 
         } catch (error) {
             console.error("Login failed:", error)
@@ -97,38 +93,46 @@ function AuthSection({ onLoginSuccess } : AuthSectionProps) {
     }
 
     return (
-        <section>
-            <h2>{t("auth.title")}</h2>
-            {authError && (
-                <p>{authError}</p>
-            )}
-            {authMode === "login" && (
-                <LoginForm
-                    email={email}
-                    password={password}
-                    setEmail={setEmail}
-                    setPassword={setPassword}
-                    onSubmit={handleLogin}
-                    onSwitchToRegister={() => setAuthMode("register")}
-                    isSubmitting={isSubmitting}
-                />
-            )}
+        <section className="auth-page">
+            <div className="card auth-card">
+                <div className="auth-header">
+                    <h2>{t("auth.title")}</h2>
+                </div>
 
-            {authMode === "register" && (
-                <RegisterForm
-                    name={name}
-                    email={email}
-                    password={password}
-                    setName={setName}
-                    setEmail={setEmail}
-                    setPassword={setPassword}
-                    onSubmit={handleRegister}
-                    onSwitchToLogin={() => setAuthMode("login")}
-                    isSubmitting={isSubmitting}
-                />
-            )}
+                {authError && (
+                    <p className="auth-error">
+                        {authError}
+                    </p>
+                )}
+
+                {authMode === "login" && (
+                    <LoginForm
+                        email={email}
+                        password={password}
+                        setEmail={setEmail}
+                        setPassword={setPassword}
+                        onSubmit={handleLogin}
+                        onSwitchToRegister={() => setAuthMode("register")}
+                        isSubmitting={isSubmitting}
+                    />
+                )}
+
+                {authMode === "register" && (
+                    <RegisterForm
+                        name={name}
+                        email={email}
+                        password={password}
+                        setName={setName}
+                        setEmail={setEmail}
+                        setPassword={setPassword}
+                        onSubmit={handleRegister}
+                        onSwitchToLogin={() => setAuthMode("login")}
+                        isSubmitting={isSubmitting}
+                    />
+                )}
+            </div>
         </section>
-    );
+    )
 }
 
 export default AuthSection

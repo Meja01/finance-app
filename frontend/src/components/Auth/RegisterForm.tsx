@@ -25,39 +25,74 @@ function RegisterForm({
                       }: RegisterFormProps) {
     const { t } = useTranslation()
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                type="text"
-                placeholder={t("auth.name")}
-                value={name}
-                onChange={event => setName(event.target.value)}
-            />
+        <form className="form" onSubmit={onSubmit}>
+            <div className="form-group">
+                <label htmlFor="register-name">
+                    {t("auth.name")}
+                </label>
 
-            <input
-                type="email"
-                placeholder={t("auth.email")}
-                value={email}
-                onChange={event => setEmail(event.target.value)}
-            />
+                <input
+                    id="register-name"
+                    className="form-control"
+                    type="text"
+                    value={name}
+                    onChange={event => setName(event.target.value)}
+                    required
+                />
+            </div>
 
-            <input
-                type="password"
-                placeholder={t("auth.password")}
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                autoComplete="new-password"
-            />
+            <div className="form-group">
+                <label htmlFor="register-email">
+                    {t("auth.email")}
+                </label>
 
-            <button type="submit" disabled={isSubmitting}>
-                {t("auth.register")}
-            </button>
+                <input
+                    id="register-email"
+                    className="form-control"
+                    type="email"
+                    value={email}
+                    onChange={event => setEmail(event.target.value)}
+                    autoComplete="username"
+                    required
+                />
+            </div>
 
-            <button
-                type="button"
-                onClick={onSwitchToLogin}
-            >
-                {t("auth.switchToLogin")}
-            </button>
+            <div className="form-group">
+                <label htmlFor="register-password">
+                    {t("auth.password")}
+                </label>
+
+                <input
+                    id="register-password"
+                    className="form-control"
+                    type="password"
+                    value={password}
+                    onChange={event => setPassword(event.target.value)}
+                    autoComplete="new-password"
+                    required
+                />
+            </div>
+
+            <div className="form-actions auth-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting
+                        ? t("common.loading")
+                        : t("auth.register")}
+                </button>
+
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onSwitchToLogin}
+                    disabled={isSubmitting}
+                >
+                    {t("auth.switchToLogin")}
+                </button>
+            </div>
         </form>
     )
 }

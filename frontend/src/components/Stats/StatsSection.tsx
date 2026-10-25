@@ -7,12 +7,10 @@ import type {AccountBalance} from "../../types/AccountBalance.ts";
 import AccountBalanceItem from "./AccountBalanceItem.tsx";
 import PeriodSelector from "../common/PeriodSelector.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "../../auth/useAuth.ts";
 
-type StatsSectionProps = {
-    accessToken: string
-}
 
-function StatsSection({ accessToken }: StatsSectionProps) {
+function StatsSection() {
     const [selectedYear, setSelectedYear] = useState(2026)
     const [selectedMonth, setSelectedMonth] = useState(10)
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStats | null>(null)
@@ -26,6 +24,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
     const [monthlyError, setMonthlyError] = useState<string | null>(null)
     const [categoryError, setCategoryError] = useState<string | null>(null)
     const [balancesError, setBalancesError] = useState<string | null>(null)
+    const {accessToken, apiFetch} = useAuth()
 
     useEffect(() => {
         if (!accessToken) {
@@ -37,14 +36,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
             setMonthlyError(null)
 
             try {
-                const response = await fetch(
-                    `http://localhost:8080/stats/monthly?year=${selectedYear}&month=${selectedMonth}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch(`http://localhost:8080/stats/monthly?year=${selectedYear}&month=${selectedMonth}`)
 
                 if (!response.ok) {
                     setMonthlyError(t("statistics.loadError"))
@@ -77,14 +69,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
             setCategoryError(null)
 
             try {
-                const response = await fetch(
-                    `http://localhost:8080/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch(`http://localhost:8080/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`)
 
                 if (!response.ok) {
                     setCategoryError(t("statistics.loadError"))
@@ -115,14 +100,7 @@ function StatsSection({ accessToken }: StatsSectionProps) {
             setBalancesError(null)
 
             try {
-                const response = await fetch(
-                    "http://localhost:8080/stats/accounts/balances",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    }
-                )
+                const response = await apiFetch("http://localhost:8080/stats/accounts/balances")
 
                 if (!response.ok) {
                     setBalancesError(t("statistics.loadError"))
@@ -161,16 +139,19 @@ function StatsSection({ accessToken }: StatsSectionProps) {
         return (
             <section>
                 <h2>{t("statistics.title")}</h2>
-                <p>{loadError}</p>
+                <p className="error-message">
+                    {loadError}
+                </p>
             </section>
         )
     }
-
     return (
         <section>
-            <h2>{t("statistics.title")}</h2>
+            <div className="page-header">
+                <h2>{t("statistics.title")}</h2>
+            </div>
 
-            <div>
+            <div className="card statistics-period">
                 <h3>{t("statistics.period")}</h3>
 
                 <PeriodSelector
@@ -181,19 +162,24 @@ function StatsSection({ accessToken }: StatsSectionProps) {
                 />
             </div>
 
-            <div>
-                <h3>{t("statistics.monthly")}</h3>
+            <section className="statistics-section">
+                <div className="section-header">
+                    <h3>{t("statistics.monthly")}</h3>
+                </div>
 
                 {monthlyStats && (
-                    <MonthlyStatsItem monthlyStats={monthlyStats} />
+                    <MonthlyStatsItem
+                        monthlyStats={monthlyStats}
+                    />
                 )}
-            </div>
+            </section>
 
-            <div>
-                <h3>{t("statistics.categories")}</h3>
+            <section className="statistics-section">
+                <div className="section-header">
+                    <h3>{t("statistics.categories")}</h3>
 
-                <div>
                     <select
+                        className="form-control statistics-type-select"
                         value={categoryStatsType}
                         onChange={event =>
                             setCategoryStatsType(
@@ -201,12 +187,17 @@ function StatsSection({ accessToken }: StatsSectionProps) {
                             )
                         }
                     >
-                        <option value="EXPENSE">{t("common.expense")}</option>
-                        <option value="INCOME">{t("common.income")}</option>
+                        <option value="EXPENSE">
+                            {t("common.expense")}
+                        </option>
+
+                        <option value="INCOME">
+                            {t("common.income")}
+                        </option>
                     </select>
                 </div>
 
-                <div>
+                <div className="category-stats-list">
                     {categoryStats.map(categoryStat => (
                         <CategoryStatsItem
                             key={categoryStat.categoryId}
@@ -214,18 +205,22 @@ function StatsSection({ accessToken }: StatsSectionProps) {
                         />
                     ))}
                 </div>
-            </div>
+            </section>
 
-            <div>
-                <h3>{t("statistics.accountBalances")}</h3>
+            <section className="statistics-section">
+                <div className="section-header">
+                    <h3>{t("statistics.accountBalances")}</h3>
+                </div>
 
-                {accountBalances.map(accountBalance => (
-                    <AccountBalanceItem
-                        key={accountBalance.accountId}
-                        accountBalance={accountBalance}
-                    />
-                ))}
-            </div>
+                <div className="account-balance-list">
+                    {accountBalances.map(accountBalance => (
+                        <AccountBalanceItem
+                            key={accountBalance.accountId}
+                            accountBalance={accountBalance}
+                        />
+                    ))}
+                </div>
+            </section>
         </section>
     )
 }

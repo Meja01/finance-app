@@ -47,87 +47,151 @@ function EditTransactionForm({transaction, categories, accounts, onUpdate, onCan
         }
     }
     return (
-        <form onSubmit={handleSubmit}>
-            <select
-                value={accountId}
-                onChange={event => setAccountId(event.target.value)}
-                required
-            >
-                <option value="">{t("transactions.selectAccount")}</option>
+        <form className="form" onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="transaction-account">
+                    {t("transactions.account")}
+                </label>
 
-                {accounts.map(account => (
-                    <option
-                        key={account.id}
-                        value={account.id}
-                    >
-                        {account.name}
+                <select
+                    id="transaction-account"
+                    className="form-control"
+                    value={accountId}
+                    onChange={event => setAccountId(event.target.value)}
+                    required
+                >
+                    <option value="">
+                        {t("transactions.selectAccount")}
                     </option>
-                ))}
-            </select>
 
-            <select
-                value={categoryId}
-                onChange={event => setCategoryId(event.target.value)}
-                required
-            >
-                <option value="">{t("transactions.selectCategory")}</option>
-
-                {categories
-                    .filter(category => category.type === transactionType)
-                    .map(category => (
+                    {accounts.map(account => (
                         <option
-                            key={category.id}
-                            value={category.id}
+                            key={account.id}
+                            value={account.id}
                         >
-                            {getCategoryDisplayName(category, t)}
+                            {account.name}
                         </option>
                     ))}
-            </select>
-            <input
-                type="datetime-local"
-                value={dateTime}
-                onChange={event => setDateTime(event.target.value)}
-                required
-            />
+                </select>
+            </div>
 
-            <select
-                value={transactionType}
-                onChange={event => {
-                    setTransactionType(
-                        event.target.value as "INCOME" | "EXPENSE"
-                    )
-                    setCategoryId("")
-                }}
-            >
-                <option value="INCOME">{t("common.income")}</option>
-                <option value="EXPENSE">{t("common.expense")}</option>
-            </select>
+            <div className="form-group">
+                <label htmlFor="transaction-type">
+                    {t("transactions.type")}
+                </label>
 
-            <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder={t("transactions.amount")}
-                value={amount}
-                onChange={event => setAmount(event.target.value)}
-                required
-            />
+                <select
+                    id="transaction-type"
+                    className="form-control"
+                    value={transactionType}
+                    onChange={event => {
+                        setTransactionType(
+                            event.target.value as "INCOME" | "EXPENSE"
+                        )
+                        setCategoryId("")
+                    }}
+                >
+                    <option value="INCOME">
+                        {t("common.income")}
+                    </option>
 
-            <input
-                type="text"
-                placeholder={t("transactions.note")}
-                value={note}
-                onChange={event => setNote(event.target.value)}
-            />
+                    <option value="EXPENSE">
+                        {t("common.expense")}
+                    </option>
+                </select>
+            </div>
 
-            <button type="submit">{t("transactions.edit")}</button>
+            <div className="form-group">
+                <label htmlFor="transaction-category">
+                    {t("transactions.category")}
+                </label>
 
-            <button
-                type="button"
-                onClick={onCancel}
-            >
-                {t("common.cancel")}
-            </button>
+                <select
+                    id="transaction-category"
+                    className="form-control"
+                    value={categoryId}
+                    onChange={event => setCategoryId(event.target.value)}
+                    required
+                >
+                    <option value="">
+                        {t("transactions.selectCategory")}
+                    </option>
+
+                    {categories
+                        .filter(category => category.type === transactionType)
+                        .map(category => (
+                            <option
+                                key={category.id}
+                                value={category.id}
+                            >
+                                {getCategoryDisplayName(category, t)}
+                            </option>
+                        ))}
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="transaction-date">
+                    {t("transactions.date")}
+                </label>
+
+                <input
+                    id="transaction-date"
+                    className="form-control"
+                    type="datetime-local"
+                    value={dateTime}
+                    onChange={event => setDateTime(event.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="transaction-amount">
+                    {t("transactions.amount")}
+                </label>
+
+                <input
+                    id="transaction-amount"
+                    className="form-control"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={amount}
+                    onChange={event => setAmount(event.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="transaction-note">
+                    {t("transactions.note")}
+                </label>
+
+                <input
+                    id="transaction-note"
+                    className="form-control"
+                    type="text"
+                    value={note}
+                    onChange={event => setNote(event.target.value)}
+                />
+            </div>
+
+            <div className="form-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                >
+                    {t("transactions.update")}
+                </button>
+
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onCancel}
+                >
+                    {t("common.cancel")}
+                </button>
+            </div>
         </form>
     )
 }

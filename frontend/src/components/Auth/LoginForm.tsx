@@ -21,33 +21,59 @@ function LoginForm({
 }: LoginFormProps) {
     const { t } = useTranslation()
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                type="email"
-                placeholder={t("auth.email")}
-                value={email}
-                onChange={event => setEmail(event.target.value)}
-                autoComplete="username"
-            />
+        <form className="form" onSubmit={onSubmit}>
+            <div className="form-group">
+                <label htmlFor="login-email">
+                    {t("auth.email")}
+                </label>
 
-            <input
-                type="password"
-                placeholder={t("auth.password")}
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                autoComplete="current-password"
-            />
+                <input
+                    id="login-email"
+                    className="form-control"
+                    type="email"
+                    value={email}
+                    onChange={event => setEmail(event.target.value)}
+                    autoComplete="username"
+                    required
+                />
+            </div>
 
-            <button type="submit" disabled={isSubmitting}>
-                {t("auth.login")}
-            </button>
+            <div className="form-group">
+                <label htmlFor="login-password">
+                    {t("auth.password")}
+                </label>
 
-            <button
-                type="button"
-                onClick={onSwitchToRegister}
-            >
-                {t("auth.switchToRegister")}
-            </button>
+                <input
+                    id="login-password"
+                    className="form-control"
+                    type="password"
+                    value={password}
+                    onChange={event => setPassword(event.target.value)}
+                    autoComplete="current-password"
+                    required
+                />
+            </div>
+
+            <div className="form-actions auth-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting
+                        ? t("common.loading")
+                        : t("auth.login")}
+                </button>
+
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onSwitchToRegister}
+                    disabled={isSubmitting}
+                >
+                    {t("auth.switchToRegister")}
+                </button>
+            </div>
         </form>
     )
 }

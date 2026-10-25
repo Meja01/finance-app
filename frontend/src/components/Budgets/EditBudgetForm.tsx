@@ -25,28 +25,43 @@ function EditBudgetForm({budget, onUpdate, onCancel} : EditBudgetFormProps) {
         }
     }
 
-    return (<form onSubmit={handleSubmit}>
-            <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder={t("budgets.amount")}
-                value={amount}
-                onChange={event => setAmount(event.target.value)}
-                required
-            />
+    return (
+        <form className="form" onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="budget-amount">
+                    {t("budgets.amount")}
+                </label>
 
-            <button type="submit">
-                {t("budgets.edit")}
-            </button>
+                <input
+                    id="budget-amount"
+                    className="form-control"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={amount}
+                    onChange={event => setAmount(event.target.value)}
+                    required
+                />
+            </div>
 
-            <button
-                type="button"
-                onClick={onCancel}
-            >
-                {t("common.cancel")}
-            </button>
-        </form>)
+            <div className="form-actions">
+                <button
+                    type="submit"
+                    className="button button-primary"
+                >
+                    {t("budgets.update")}
+                </button>
+
+                <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onCancel}
+                >
+                    {t("common.cancel")}
+                </button>
+            </div>
+        </form>
+    )
 }
 
 export default EditBudgetForm
