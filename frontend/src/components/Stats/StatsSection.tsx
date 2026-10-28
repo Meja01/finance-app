@@ -8,6 +8,7 @@ import AccountBalanceItem from "./AccountBalanceItem.tsx";
 import PeriodSelector from "../common/PeriodSelector.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 
 function StatsSection() {
@@ -36,7 +37,7 @@ function StatsSection() {
             setMonthlyError(null)
 
             try {
-                const response = await apiFetch(`http://localhost:8080/stats/monthly?year=${selectedYear}&month=${selectedMonth}`)
+                const response = await apiFetch(`${API_URL}/stats/monthly?year=${selectedYear}&month=${selectedMonth}`)
 
                 if (!response.ok) {
                     setMonthlyError(t("statistics.loadError"))
@@ -69,7 +70,7 @@ function StatsSection() {
             setCategoryError(null)
 
             try {
-                const response = await apiFetch(`http://localhost:8080/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`)
+                const response = await apiFetch(`${API_URL}/stats/categories?year=${selectedYear}&month=${selectedMonth}&type=${categoryStatsType}`)
 
                 if (!response.ok) {
                     setCategoryError(t("statistics.loadError"))
@@ -100,7 +101,7 @@ function StatsSection() {
             setBalancesError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/stats/accounts/balances")
+                const response = await apiFetch(`${API_URL}/stats/accounts/balances`)
 
                 if (!response.ok) {
                     setBalancesError(t("statistics.loadError"))

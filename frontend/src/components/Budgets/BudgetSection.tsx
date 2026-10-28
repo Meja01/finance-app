@@ -10,6 +10,7 @@ import PeriodSelector from "../common/PeriodSelector.tsx";
 import {useTranslation} from "react-i18next";
 import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 type BudgetSectionProps = {
     categories: Category[]
@@ -44,7 +45,7 @@ function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetS
             setBudgetsError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/budgets")
+                const response = await apiFetch(`${API_URL}/budgets`)
 
                 if (!response.ok) {
                     setBudgetsError(t("budgets.loadError"))
@@ -77,7 +78,7 @@ function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetS
             setProgressError(null)
 
             try {
-                const response = await apiFetch(`http://localhost:8080/budgets/progress?year=${selectedYear}&month=${selectedMonth}`)
+                const response = await apiFetch(`${API_URL}/budgets/progress?year=${selectedYear}&month=${selectedMonth}`)
 
                 if (!response.ok) {
                     setProgressError(t("budgets.progressLoadError"))
@@ -110,7 +111,7 @@ function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetS
 
         try {
             const response = await apiFetch(
-                "http://localhost:8080/budgets",
+                `${API_URL}/budgets`,
                 {
                     method: "POST",
                     headers: {
@@ -146,7 +147,7 @@ function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetS
         setActionError(null)
         try {
             const response = await apiFetch(
-                `http://localhost:8080/budgets/${budgetId}`,
+                `${API_URL}/budgets/${budgetId}`,
                 {
                     method: "DELETE"
                 }
@@ -171,7 +172,7 @@ function BudgetSection({categories, categoriesLoaded, categoriesError} : BudgetS
 
         try {
             const response = await apiFetch(
-                `http://localhost:8080/budgets/${budgetId}`,
+                `${API_URL}/budgets/${budgetId}`,
                 {
                     method: "PUT",
                     headers: {

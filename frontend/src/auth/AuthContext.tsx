@@ -4,6 +4,7 @@ import {
     useState,
     type ReactNode
 } from "react"
+import {API_URL} from "../config/api.ts";
 
 type AuthContextType = {
     accessToken: string
@@ -56,7 +57,7 @@ export function AuthProvider({children}: AuthProviderProps) {
     async function refreshAccessToken(token: string): Promise<string | null> {
         try {
             const response = await fetch(
-                "http://localhost:8080/users/refresh",
+                `${API_URL}/users/refresh`,
                 {
                     method: "POST",
                     headers: {
@@ -125,7 +126,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
             try {
                 const response = await fetch(
-                    "http://localhost:8080/users/refresh",
+                    `${API_URL}/users/refresh`,
                     {
                         method: "POST",
                         headers: {
@@ -162,7 +163,7 @@ export function AuthProvider({children}: AuthProviderProps) {
     async function handleLogout() {
         try {
             const response = await fetch(
-                "http://localhost:8080/users/logout",
+                `${API_URL}/users/logout`,
                 {
                     method: "POST",
                     headers: {

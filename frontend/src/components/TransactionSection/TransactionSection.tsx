@@ -8,6 +8,7 @@ import EditTransactionForm from "./EditTransactionForm.tsx";
 import {useTranslation} from "react-i18next";
 import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 type TransactionSectionProps = {
     accounts: Account[],
@@ -42,7 +43,7 @@ function TransactionSection({accounts, accountsLoaded, categories, categoriesLoa
             setIsLoading(true)
             setLoadError(null)
 
-            let url = "http://localhost:8080/transactions"
+            let url = `${API_URL}/transactions`
 
             if (filterAccountId) {
                 url += `?accountId=${filterAccountId}`
@@ -88,7 +89,7 @@ function TransactionSection({accounts, accountsLoaded, categories, categoriesLoa
     ): Promise<boolean> {
         setActionError(null)
         try {
-            const response = await apiFetch("http://localhost:8080/transactions", {
+            const response = await apiFetch(`${API_URL}/transactions`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -124,7 +125,7 @@ function TransactionSection({accounts, accountsLoaded, categories, categoriesLoa
         setActionError(null)
         try {
             const response = await apiFetch(
-                `http://localhost:8080/transactions/${transactionId}`,
+                `${API_URL}/transactions/${transactionId}`,
                 {
                     method: "DELETE",
                 }
@@ -153,7 +154,7 @@ function TransactionSection({accounts, accountsLoaded, categories, categoriesLoa
         setActionError(null)
 
         try {
-            const response = await apiFetch(`http://localhost:8080/transactions/${transactionId}`, {
+            const response = await apiFetch(`${API_URL}/transactions/${transactionId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

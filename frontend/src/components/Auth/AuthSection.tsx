@@ -3,6 +3,7 @@ import LoginForm from "./LoginForm.tsx";
 import RegisterForm from "./RegisterForm.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 
 function AuthSection() {
@@ -24,7 +25,7 @@ function AuthSection() {
 
         try {
             const response = await fetch(
-                "http://localhost:8080/users/register",
+                `${API_URL}/users/register`,
                 {
                     method: "POST",
                     headers: {
@@ -63,7 +64,7 @@ function AuthSection() {
 
         try {
             const response = await fetch(
-                "http://localhost:8080/users/login",
+                `${API_URL}/users/login`,
                 {
                     method: "POST",
                     headers: {

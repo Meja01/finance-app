@@ -8,6 +8,7 @@ import EditRecurringTransactionForm from "./EditRecurringTransactionForm.tsx";
 import {useTranslation} from "react-i18next";
 import {getCategoryDisplayName} from "../utils/getCategoryDisplayName.ts";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 
 type RecurringTransactionSectionProps = {
@@ -39,7 +40,7 @@ function RecurringTransactionSection({accounts, categories, accountsLoaded, cate
             setLoadError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/recurring-transactions")
+                const response = await apiFetch(`${API_URL}/recurring-transactions`)
 
                 if (!response.ok) {
                     setLoadError(t("recurring.loadError"))
@@ -80,7 +81,7 @@ function RecurringTransactionSection({accounts, categories, accountsLoaded, cate
 
         try {
             const response = await apiFetch(
-                "http://localhost:8080/recurring-transactions",
+                `${API_URL}/recurring-transactions`,
                 {
                     method: "POST",
                     headers: {
@@ -130,7 +131,7 @@ function RecurringTransactionSection({accounts, categories, accountsLoaded, cate
 
         try {
             const response = await apiFetch(
-                `http://localhost:8080/recurring-transactions/${recurringTransactionId}`,
+                `${API_URL}/recurring-transactions/${recurringTransactionId}`,
                 {
                     method: "PUT",
                     headers: {
@@ -182,7 +183,7 @@ function RecurringTransactionSection({accounts, categories, accountsLoaded, cate
 
         try {
             const response = await apiFetch(
-                `http://localhost:8080/recurring-transactions/${recurringTransactionId}`,
+                `${API_URL}/recurring-transactions/${recurringTransactionId}`,
                 {
                     method: "DELETE"
                 }

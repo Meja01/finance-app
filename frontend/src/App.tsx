@@ -12,6 +12,7 @@ import DashboardSection from "./components/Dashboard/DashboardSection.tsx";
 import {useTranslation} from "react-i18next"
 import {useAuth} from "./auth/useAuth.ts";
 import CategorySection from "./components/Categories/CategorySection.tsx";
+import {API_URL} from "./config/api.ts";
 
 type Page =
     | "dashboard"
@@ -52,7 +53,7 @@ function App() {
             setAccountsError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/accounts")
+                const response = await apiFetch(`${API_URL}/accounts`)
 
                 if (!response.ok) {
                     setAccountsError(t("accounts.loadError"))
@@ -83,7 +84,7 @@ function App() {
             setCategoriesError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/categories")
+                const response = await apiFetch(`${API_URL}/categories`)
 
                 if (!response.ok) {
                     setCategoriesError(t("transactions.categories.loadError"))

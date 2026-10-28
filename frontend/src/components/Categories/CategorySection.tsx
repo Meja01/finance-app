@@ -5,6 +5,7 @@ import {useAuth} from "../../auth/useAuth.ts";
 import CreateCategoryForm from "./CreateCategoryForm.tsx";
 import EditCategoryForm from "./EditCategoryForm.tsx";
 import CategoryItem from "./CategoryItem.tsx";
+import {API_URL} from "../../config/api.ts";
 
 type CategoriesSectionProps = {
     categories: Category[],
@@ -24,7 +25,7 @@ export default function CategorySection({ categories, setCategories, categoriesL
     async function handleCreateCategory(name: string, type: "INCOME" | "EXPENSE"):Promise<boolean> {
         setActionError(null)
         try {
-            const response = await apiFetch("http://localhost:8080/categories", {
+            const response = await apiFetch(`${API_URL}/categories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -53,7 +54,7 @@ export default function CategorySection({ categories, setCategories, categoriesL
     async function handleUpdateCategory(categoryId: string, name: string):Promise<boolean> {
         setActionError(null)
         try {
-            const response = await apiFetch(`http://localhost:8080/categories/${categoryId}`, {
+            const response = await apiFetch(`${API_URL}/categories/${categoryId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -85,7 +86,7 @@ export default function CategorySection({ categories, setCategories, categoriesL
         setActionError(null)
         try {
             const response = await apiFetch(
-                `http://localhost:8080/categories/${categoryId}`,
+                `${API_URL}/categories/${categoryId}`,
                 {
                     method: "DELETE",
                 }

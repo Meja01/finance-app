@@ -5,6 +5,7 @@ import EditAccountForm from "./EditAccountForm"
 import AccountItem from "./AccountItem.tsx"
 import {useTranslation} from "react-i18next";
 import {useAuth} from "../../auth/useAuth.ts";
+import {API_URL} from "../../config/api.ts";
 
 type AccountSectionProps = {
     accounts: Account[],
@@ -28,7 +29,7 @@ function AccountSection ({accounts, setAccounts, accountsLoaded, accountsError} 
         setActionError(null)
 
         try {
-            const response = await apiFetch("http://localhost:8080/accounts", {
+            const response = await apiFetch(`${API_URL}/accounts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,7 +65,7 @@ function AccountSection ({accounts, setAccounts, accountsLoaded, accountsError} 
         setActionError(null)
         try {
             const response = await apiFetch(
-                `http://localhost:8080/accounts/${accountId}`,
+                `${API_URL}/${accountId}`,
                 {
                     method: "DELETE"
                 }
@@ -94,7 +95,7 @@ function AccountSection ({accounts, setAccounts, accountsLoaded, accountsError} 
         initialBalance: number): Promise<boolean> {
         setActionError(null)
         try {
-            const response = await apiFetch(`http://localhost:8080/accounts/${accountId}`, {
+            const response = await apiFetch(`${API_URL}/accounts/${accountId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

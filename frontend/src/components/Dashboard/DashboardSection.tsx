@@ -6,6 +6,7 @@ import {useAuth} from "../../auth/useAuth.ts";
 import {formatCurrency} from "../utils/formatCurrency.ts";
 import type {CategoryStats} from "../../types/CategoryStats.ts";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts"
+import {API_URL} from "../../config/api.ts";
 
 
 function DashboardSection() {
@@ -38,7 +39,7 @@ function DashboardSection() {
             const month = now.getMonth() + 1
 
             try {
-                const response = await apiFetch(`http://localhost:8080/stats/monthly?year=${year}&month=${month}`)
+                const response = await apiFetch(`${API_URL}/stats/monthly?year=${year}&month=${month}`)
 
                 if (!response.ok) {
                     setMonthlyError(t("dashboard.loadError"))
@@ -70,7 +71,7 @@ function DashboardSection() {
             setBalancesError(null)
 
             try {
-                const response = await apiFetch("http://localhost:8080/stats/accounts/balances")
+                const response = await apiFetch(`${API_URL}/stats/accounts/balances`)
 
                 if (!response.ok) {
                     setBalancesError(t("dashboard.loadError"))
@@ -108,7 +109,7 @@ function DashboardSection() {
 
             try {
                 const response = await apiFetch(
-                    `http://localhost:8080/stats/categories?year=${year}&month=${month}&type=EXPENSE`
+                    `${API_URL}/stats/categories?year=${year}&month=${month}&type=EXPENSE`
                 )
 
                 if (!response.ok) {
