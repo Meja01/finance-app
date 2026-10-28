@@ -3,13 +3,51 @@ services:
     image: postgres:15-alpine
     container_name: finance_postgres
     environment:
-      POSTGRES_USER: finance_user
-      POSTGRES_PASSWORD: finance_password
-      POSTGRES_DB: finance
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: finance_backend
+
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      REFRESH_TOKEN_EXPIRATION_DAYS: ${REFRESH_TOKEN_EXPIRATION_DAYS}
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - postgres
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: finance_frontend
+
+    ports:
+      - "5173:80"
+
+    depends_on:
+      - backend
+
 
 volumes:
   pgdata:

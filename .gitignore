@@ -41,7 +41,6 @@ build/
 
 ### Local secrets / environment ###
 .env
-.env.*
 application-local.properties
 
 htmlReport/
