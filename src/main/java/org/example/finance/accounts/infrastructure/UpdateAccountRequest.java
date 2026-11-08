@@ -1,11 +1,19 @@
 package org.example.finance.accounts.infrastructure;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.example.finance.accounts.domain.AccountType;
 
 import java.math.BigDecimal;
 
 public record UpdateAccountRequest(
+        @NotBlank
+        @Size(max = 100)
         String name,
+        @NotNull
         AccountType type,
-        BigDecimal initialBalance) {
+        @NotNull
+        BigDecimal initialBalance
+) {
 }

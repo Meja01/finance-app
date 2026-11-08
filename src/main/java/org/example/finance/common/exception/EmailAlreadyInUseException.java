@@ -1,4 +1,4 @@
-package org.example.finance.users.application;
+package org.example.finance.common.exception;
 
 public class EmailAlreadyInUseException extends RuntimeException {
     public EmailAlreadyInUseException(String email) {

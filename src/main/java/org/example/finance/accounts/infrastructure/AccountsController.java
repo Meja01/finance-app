@@ -1,4 +1,5 @@
 package org.example.finance.accounts.infrastructure;
+import jakarta.validation.Valid;
 import org.example.finance.accounts.application.CreateAccountService;
 import org.example.finance.accounts.application.DeleteAccountService;
 import org.example.finance.accounts.application.GetAccountService;
@@ -46,7 +47,7 @@ public class AccountsController {
     }
 
     @PostMapping
-    public AccountResponse createAccount(@RequestBody CreateAccountRequest request, Authentication authentication) {
+    public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest request, Authentication authentication) {
         Account account = createAccountService.createAccount(
                 (UUID) authentication.getPrincipal(),
                 request.name(),
@@ -57,7 +58,7 @@ public class AccountsController {
     }
 
     @PutMapping("/{accountId}")
-    public AccountResponse updateAccount(@PathVariable UUID accountId, @RequestBody UpdateAccountRequest request, Authentication authentication) {
+    public AccountResponse updateAccount(@PathVariable UUID accountId, @Valid @RequestBody UpdateAccountRequest request, Authentication authentication) {
         Account account = updateAccountService.updateAccount(
                 (UUID)authentication.getPrincipal(),
                 accountId,

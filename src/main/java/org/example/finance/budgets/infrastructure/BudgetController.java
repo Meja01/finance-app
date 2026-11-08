@@ -1,5 +1,6 @@
 package org.example.finance.budgets.infrastructure;
 
+import jakarta.validation.Valid;
 import org.example.finance.budgets.application.*;
 import org.example.finance.budgets.domain.Budget;
 import org.example.finance.budgets.domain.BudgetRepository;
@@ -31,7 +32,7 @@ public class BudgetController {
     }
 
     @PostMapping
-    public BudgetResponse createBudget(@RequestBody CreateBudgetRequest budgetRequest, Authentication authentication) {
+    public BudgetResponse createBudget(@Valid @RequestBody CreateBudgetRequest budgetRequest, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
 
         Budget budget = createBudgetService.createBudget(
@@ -91,7 +92,7 @@ public class BudgetController {
     }
 
     @PutMapping("/{budgetId}")
-    public BudgetResponse updateBudget(@PathVariable UUID budgetId, @RequestBody UpdateBudgetRequest budgetRequest, Authentication authentication) {
+    public BudgetResponse updateBudget(@PathVariable UUID budgetId, @Valid @RequestBody UpdateBudgetRequest budgetRequest, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
         Budget budget = updateBudgetService.updateBudget(budgetId, userId, budgetRequest.amount());
 

@@ -2,6 +2,8 @@ package org.example.finance.budgets.application;
 
 import org.example.finance.budgets.domain.Budget;
 import org.example.finance.budgets.domain.BudgetRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.Category;
 import org.example.finance.transactions.domain.CategoryRepository;
 import org.example.finance.transactions.domain.TransactionType;
@@ -21,19 +23,14 @@ public class UpdateBudgetService {
     }
 
     public Budget updateBudget(UUID id, UUID userId, BigDecimal amount) {
-        Budget budget = budgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Budget not found!"));
-        if (!budget.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
-                    "Budget does not belong to user!"
-            );
-        }
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    "Amount must be greater than zero!"
-            );
-        }
-        budget.updateAmount(amount);
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Budget not found!"));
 
+        if (!budget.getUserId().equals(userId)) {
+            throw new ForbiddenOperationException("Budget does not belong to user!");
+        }
+
+        budget.updateAmount(amount);
         return budgetRepository.save(budget);
     }
 }

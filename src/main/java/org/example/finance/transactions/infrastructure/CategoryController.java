@@ -1,5 +1,6 @@
 package org.example.finance.transactions.infrastructure;
 
+import jakarta.validation.Valid;
 import org.example.finance.transactions.application.CreateCategoryService;
 import org.example.finance.transactions.application.DeleteCategoryService;
 import org.example.finance.transactions.application.GetCategoryService;
@@ -35,14 +36,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryResponse createCategory(@RequestBody CreateCategoryRequest request, Authentication authentication) {
+    public CategoryResponse createCategory(@Valid @RequestBody CreateCategoryRequest request, Authentication authentication) {
         Category category = createCategoryService.createCategory((UUID) authentication.getPrincipal(), request.name(), request.type());
 
         return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId() ,category.isGlobal());
     }
 
     @PutMapping("/{categoryId}")
-    public CategoryResponse updateCategory(@PathVariable UUID categoryId, @RequestBody UpdateCategoryRequest request, Authentication authentication) {
+    public CategoryResponse updateCategory(@PathVariable UUID categoryId, @Valid @RequestBody UpdateCategoryRequest request, Authentication authentication) {
         Category category = updateCategoryService.updateCategory(categoryId, (UUID) authentication.getPrincipal(), request.name());
 
         return new CategoryResponse(category.getId(), category.getName(), category.getType() ,category.getUserId() ,category.isGlobal());

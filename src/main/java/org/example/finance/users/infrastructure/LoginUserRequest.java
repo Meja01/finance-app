@@ -1,4 +1,13 @@
 package org.example.finance.users.infrastructure;
 
-public record LoginUserRequest(String email, String password) {
-}
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginUserRequest(
+        @NotBlank
+        @Email
+        String email,
+
+        @NotBlank
+        String password
+) {}

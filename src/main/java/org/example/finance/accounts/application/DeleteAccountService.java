@@ -2,6 +2,7 @@ package org.example.finance.accounts.application;
 
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -18,7 +19,7 @@ public class DeleteAccountService {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found!"));
 
         if (!account.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Account does not belong to user!");
+            throw new ForbiddenOperationException("Account does not belong to user!");
         }
         accountRepository.delete(account);
     }

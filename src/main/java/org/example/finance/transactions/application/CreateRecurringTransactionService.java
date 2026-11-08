@@ -2,6 +2,8 @@ package org.example.finance.transactions.application;
 
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -32,33 +34,24 @@ public class CreateRecurringTransactionService {
             LocalDate startDate,
             LocalDate endDate
     ) {
-        if (accountId == null) {
-            throw new IllegalArgumentException("Account must not be null!");
-        }
-        if (categoryId == null) {
-            throw new IllegalArgumentException("Category Id must not be null!");
-        }
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    "Amount must be greater than zero!"
-            );
-        }
-        if (transactionType == null) {
-            throw new IllegalArgumentException("Transaction Type must not be null!");
-        }
-
-        Account account = accountRepository.findById(accountId).orElseThrow(() ->
-                new IllegalArgumentException("Account not found!"));
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Account not found!")
+                );
 
         if (!account.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Account does not belong to user!");
+            throw new ForbiddenOperationException(
+                    "Account does not belong to user!"
+            );
         }
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new IllegalArgumentException("Category not found!"));
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found!")
+                );
 
         if (!category.isGlobal() && !category.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Category must either be global or belong to the user!"
             );
         }
@@ -69,18 +62,25 @@ public class CreateRecurringTransactionService {
             );
         }
 
-        if (recurringFrequency == null) {
-            throw new IllegalArgumentException("Frequency type must not be null!");
-        }
-        if (startDate == null) {
-            throw new IllegalArgumentException("Start Date must not be null!");
-        }
         if (endDate != null && startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("End Date must be after or equal to Start Date!");
+            throw new IllegalArgumentException(
+                    "End Date must be after or equal to Start Date!"
+            );
         }
 
-        RecurringTransaction recurringTransaction = new RecurringTransaction(
-                userId, accountId, categoryId, amount,transactionType, note, recurringFrequency, startDate, endDate);
+        RecurringTransaction recurringTransaction =
+                new RecurringTransaction(
+                        userId,
+                        accountId,
+                        categoryId,
+                        amount,
+                        transactionType,
+                        note,
+                        recurringFrequency,
+                        startDate,
+                        endDate
+                );
+
         return recurringTransactionRepository.save(recurringTransaction);
     }
 }

@@ -1,6 +1,7 @@
 package org.example.finance.transactions.infrastructure;
 
 
+import jakarta.validation.Valid;
 import org.example.finance.transactions.application.CreateRecurringTransactionService;
 import org.example.finance.transactions.application.DeactivateRecurringTransactionService;
 import org.example.finance.transactions.application.GetRecurringTransactionsService;
@@ -29,7 +30,7 @@ public class RecurringTransactionController {
     }
 
     @PostMapping
-    public RecurringTransactionResponse createRecurringTransaction(@RequestBody CreateRecurringTransactionRequest request, Authentication authentication) {
+    public RecurringTransactionResponse createRecurringTransaction(@Valid @RequestBody CreateRecurringTransactionRequest request, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
 
         RecurringTransaction recurringTransaction = createRecurringTransactionService.createRecurringTransaction(
@@ -72,7 +73,7 @@ public class RecurringTransactionController {
     }
 
     @PutMapping("/{recurringTransactionId}")
-    public RecurringTransactionResponse updateRecurringTransaction(@PathVariable UUID recurringTransactionId, @RequestBody UpdateRecurringTransactionRequest request, Authentication authentication) {
+    public RecurringTransactionResponse updateRecurringTransaction(@PathVariable UUID recurringTransactionId, @Valid @RequestBody UpdateRecurringTransactionRequest request, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
         RecurringTransaction recurringTransaction = updateRecurringTransactionService.updateRecurringTransaction(
                 recurringTransactionId, userId, request.accountId(), request.categoryId(), request.amount(), request.frequency(),

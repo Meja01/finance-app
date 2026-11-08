@@ -3,6 +3,8 @@ package org.example.finance.accounts.application;
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountType;
 import org.example.finance.accounts.infrastructure.SpringDataAccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.users.domain.User;
 import org.example.finance.users.application.RegisterUserService;
 import org.example.finance.users.infrastructure.SpringDataUserRepository;
@@ -159,7 +161,7 @@ class AccountServiceIntegrationTest {
     }
 
     @Test
-    void userCannotUpdateAnotherUsersAccount() {
+    void userCannotUpdateAnotherUsersAccountAndMissingAccountThrowsNotFound() {
         User owner = registerUserService.register(
                 "Owner",
                 "owner@example.com",
@@ -179,8 +181,8 @@ class AccountServiceIntegrationTest {
                 new BigDecimal("1000.00")
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException forbiddenException = assertThrows(
+                ForbiddenOperationException.class,
                 () -> updateAccountService.updateAccount(
                         otherUser.getId(),
                         account.getId(),
@@ -192,16 +194,33 @@ class AccountServiceIntegrationTest {
 
         assertEquals(
                 "Account does not belong to user!",
-                exception.getMessage()
+                forbiddenException.getMessage()
         );
 
-        Account unchangedAccount =
-                springDataAccountRepository
-                        .findById(account.getId())
-                        .orElseThrow();
+        Account unchangedAccount = springDataAccountRepository
+                .findById(account.getId())
+                .orElseThrow();
 
         assertEquals("Owner Account", unchangedAccount.getName());
         assertEquals(AccountType.CARD, unchangedAccount.getType());
+
+        UUID missingAccountId = UUID.randomUUID();
+
+        ResourceNotFoundException notFoundException = assertThrows(
+                ResourceNotFoundException.class,
+                () -> updateAccountService.updateAccount(
+                        owner.getId(),
+                        missingAccountId,
+                        "Missing Account",
+                        AccountType.CASH,
+                        new BigDecimal("500.00")
+                )
+        );
+
+        assertEquals(
+                "Account not found!",
+                notFoundException.getMessage()
+        );
     }
 
     @Test
@@ -254,8 +273,8 @@ class AccountServiceIntegrationTest {
                 new BigDecimal("1000.00")
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> deleteAccountService.deleteAccount(
                         otherUser.getId(),
                         account.getId()

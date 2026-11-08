@@ -1,5 +1,7 @@
 package org.example.finance.transactions.application;
 
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.Transaction;
 import org.example.finance.transactions.domain.TransactionRepository;
 import org.example.finance.transactions.domain.TransactionType;
@@ -23,10 +25,10 @@ public class GetTransactionService {
     }
     public Transaction getTransaction(UUID userId, UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() ->
-                new IllegalArgumentException("Transaction not found!")
+                new ResourceNotFoundException("Transaction not found!")
         );
         if (!transaction.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Transaction does not belong to user!"
             );
         }

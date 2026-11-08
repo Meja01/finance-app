@@ -1,5 +1,6 @@
 package org.example.finance.users.application;
 
+import org.example.finance.common.exception.EmailAlreadyInUseException;
 import org.example.finance.users.domain.User;
 import org.example.finance.users.domain.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,15 +19,6 @@ public class RegisterUserService {
     }
 
     public User register(String name, String email, String rawPassword) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name must not be empty!");
-        }
-        if(!isValid(email)) {
-            throw new IllegalArgumentException("Email is invalid!");
-        }
-        if (rawPassword == null || rawPassword.length() < 8) {
-            throw new IllegalArgumentException("Password must be at least 8 characters long!");
-        }
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyInUseException(email);
         }
@@ -34,12 +26,5 @@ public class RegisterUserService {
 
         User user = new User(name, email, passwordHash);
         return userRepository.save(user);
-    }
-
-    public static boolean isValid(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern p = Pattern.compile(emailRegex);
-        return email != null && p.matcher(email).matches();
     }
 }

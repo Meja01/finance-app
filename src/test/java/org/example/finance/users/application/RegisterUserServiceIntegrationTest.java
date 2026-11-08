@@ -1,4 +1,5 @@
 package org.example.finance.users.application;
+import org.example.finance.common.exception.EmailAlreadyInUseException;
 import org.example.finance.users.domain.User;
 
 
@@ -35,53 +36,6 @@ public class RegisterUserServiceIntegrationTest {
 
         assertNotNull(user);
         assertEquals("milan@example.com", user.getEmail());
-    }
-
-    @Test
-    void testRegisterUserInvalidCredentials() {
-        IllegalArgumentException exceptionEmptyName = assertThrows(
-                IllegalArgumentException.class,
-                () -> registerUserService.register(
-                        "",
-                        "test@example.com",
-                        "secret123"
-                )
-        );
-
-        assertEquals("Name must not be empty!", exceptionEmptyName.getMessage());
-
-        IllegalArgumentException exceptionBlankName = assertThrows(
-                IllegalArgumentException.class,
-                () -> registerUserService.register(
-                        " ",
-                        "test@example.com",
-                        "secret123"
-                )
-        );
-
-        assertEquals("Name must not be empty!", exceptionBlankName.getMessage());
-
-        IllegalArgumentException exceptionInvalidEmail = assertThrows(
-                IllegalArgumentException.class,
-                () -> registerUserService.register(
-                        "TestUser",
-                        "example.org",
-                        "secret123"
-                )
-        );
-
-        assertEquals("Email is invalid!", exceptionInvalidEmail.getMessage());
-
-        IllegalArgumentException exceptionInvalidPassword = assertThrows(
-                IllegalArgumentException.class,
-                () -> registerUserService.register(
-                        "TestUser",
-                        "test@example.com",
-                        " "
-                )
-        );
-
-        assertEquals("Password must be at least 8 characters long!", exceptionInvalidPassword.getMessage());
     }
 
     @Test

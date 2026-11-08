@@ -2,6 +2,8 @@ package org.example.finance.transactions.application;
 
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.Transaction;
 import org.example.finance.transactions.domain.TransactionRepository;
 import org.example.finance.transactions.domain.TransactionType;
@@ -24,11 +26,11 @@ public class GetAccountBalanceService {
 
     public AccountBalanceResponse getAccountBalance(UUID userId, UUID accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() ->
-                new IllegalArgumentException("Account not found!")
+                new ResourceNotFoundException("Account not found!")
         );
 
         if (!account.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Account does not belong to user!"
             );
         }

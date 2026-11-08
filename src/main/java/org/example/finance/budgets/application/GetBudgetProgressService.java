@@ -4,6 +4,7 @@ import org.example.finance.budgets.domain.Budget;
 import org.example.finance.budgets.domain.BudgetRepository;
 import org.example.finance.budgets.infrastructure.BudgetProgressResponse;
 import org.example.finance.budgets.infrastructure.BudgetResponse;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class GetBudgetProgressService {
             BigDecimal percentageUsed = spentAmount.multiply(BigDecimal.valueOf(100))
                     .divide(budget.getAmount(), 2, RoundingMode.HALF_UP);
             Category category = categoryRepository.findById(budget.getCategoryId()).orElseThrow(() ->
-                            new IllegalStateException("Category not found!"));
+                            new ResourceNotFoundException("Category not found!"));
             result.add(new BudgetProgressResponse(
                             budget.getId(),
                             budget.getCategoryId(),

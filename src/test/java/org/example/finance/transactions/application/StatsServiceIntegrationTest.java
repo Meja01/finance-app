@@ -4,6 +4,7 @@ import org.example.finance.accounts.application.CreateAccountService;
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountType;
 import org.example.finance.accounts.infrastructure.SpringDataAccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
 import org.example.finance.transactions.domain.Category;
 import org.example.finance.transactions.domain.TransactionType;
 import org.example.finance.transactions.infrastructure.*;
@@ -346,8 +347,8 @@ public class StatsServiceIntegrationTest {
                 new BigDecimal("1000.00")
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> getAccountBalanceService.getAccountBalance(
                         otherUser.getId(),
                         account.getId()

@@ -16,12 +16,6 @@ public class CreateCategoryService {
     }
 
     public Category createCategory(UUID userId, String name, TransactionType type) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name must not be empty!");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("type must not be null!");
-        }
         if (repository.existsByNameAndTypeAndGlobalTrue(name, type)) {
             throw new IllegalArgumentException("A global category with this name and type already exists!");
         }

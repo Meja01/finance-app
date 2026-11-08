@@ -2,6 +2,7 @@ package org.example.finance.budgets.application;
 
 import org.example.finance.budgets.domain.Budget;
 import org.example.finance.budgets.domain.BudgetRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,7 +18,7 @@ public class DeleteBudgetService {
     public void deleteBudget(UUID id, UUID userId) {
         Budget budget = budgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Budget not found!"));
         if (!budget.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Budget does not belong to user!"
             );
         }

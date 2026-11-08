@@ -1,5 +1,7 @@
 package org.example.finance.transactions.application;
 
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +21,17 @@ public class DeleteCategoryService {
 
     public void deleteCategory(UUID id, UUID userId) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Category not found!")
+                new ResourceNotFoundException("Category not found!")
         );
 
         if (category.isGlobal()) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Global Category can't be deleted!"
             );
         }
 
         if (!category.getUserId().equals(userId)) {
-            throw new IllegalArgumentException(
+            throw new ForbiddenOperationException(
                     "Category does not belong to user!"
             );
         }
@@ -37,7 +39,7 @@ public class DeleteCategoryService {
         Category globalCategoryOther = categoryRepository.findByNameAndTypeAndGlobalTrue(
                         "Other",
                         category.getType())
-                .orElseThrow(() -> new IllegalStateException("Global Other category not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Global Other category not found!"));
 
         for (Transaction transaction : transactions) {
             transaction.changeCategory(globalCategoryOther.getId());

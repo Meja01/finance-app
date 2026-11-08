@@ -1,21 +1,21 @@
 package org.example.finance.transactions.infrastructure;
 
-import org.example.finance.accounts.application.UpdateAccountService;
 import org.example.finance.transactions.application.CreateTransactionService;
 import org.example.finance.transactions.application.DeleteTransactionService;
 import org.example.finance.transactions.application.GetTransactionService;
 import org.example.finance.transactions.application.UpdateTransactionService;
 import org.example.finance.transactions.domain.Transaction;
-import org.example.finance.transactions.domain.TransactionRepository;
 import org.example.finance.transactions.domain.TransactionType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
 @RequestMapping("/transactions")
@@ -33,7 +33,8 @@ public class TransactionController {
     }
 
     @PostMapping
-    public TransactionResponse createTransaction(@RequestBody TransactionRequest request, Authentication authentication) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionResponse createTransaction(@Valid @RequestBody TransactionRequest request, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
         Transaction transaction = createTransactionService.createTransaction(
                 userId, request.accountId(), request.categoryId(), request.amount(), request.dateTime(), request.note(), request.type());
@@ -109,7 +110,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{transactionId}")
-    public TransactionResponse updateTransaction(@PathVariable UUID transactionId, @RequestBody TransactionRequest request, Authentication authentication) {
+    public TransactionResponse updateTransaction(@PathVariable UUID transactionId, @Valid @RequestBody TransactionRequest request, Authentication authentication) {
         UUID userId = (UUID) authentication.getPrincipal();
         Transaction transaction = updateTransactionService.updateTransaction(
                 transactionId,

@@ -3,6 +3,8 @@ package org.example.finance.accounts.application;
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountRepository;
 import org.example.finance.accounts.domain.AccountType;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,10 +19,10 @@ public class UpdateAccountService {
     }
 
     public Account updateAccount(UUID userId, UUID accountId, String name, AccountType type, BigDecimal initialBalance) {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found!"));
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("Account not found!"));
 
         if (!account.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Account does not belong to user!");
+            throw new ForbiddenOperationException("Account does not belong to user!");
         }
 
         account.update(name, type, initialBalance);

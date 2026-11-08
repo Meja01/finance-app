@@ -3,6 +3,7 @@ import org.example.finance.accounts.application.CreateAccountService;
 import org.example.finance.accounts.domain.Account;
 import org.example.finance.accounts.domain.AccountType;
 import org.example.finance.accounts.infrastructure.SpringDataAccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
 import org.example.finance.transactions.domain.*;
 import org.example.finance.transactions.infrastructure.SpringDataRecurringTransactionRepository;
 import org.example.finance.transactions.infrastructure.SpringDataTransactionRepository;
@@ -394,8 +395,8 @@ class RecurringTransactionServiceIntegrationTest {
                         null
                 );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> deactivateRecurringTransactionService
                         .deactivateRecurringTransaction(
                                 recurring.getId(),
@@ -403,10 +404,7 @@ class RecurringTransactionServiceIntegrationTest {
                         )
         );
 
-        assertEquals(
-                "Recurring Transaction does not belong to user!",
-                exception.getMessage()
-        );
+        assertEquals("Recurring Transaction does not belong to user!", exception.getMessage());
 
         RecurringTransaction persisted =
                 springDataRecurringTransactionRepository

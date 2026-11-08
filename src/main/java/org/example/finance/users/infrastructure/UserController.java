@@ -1,5 +1,6 @@
 package org.example.finance.users.infrastructure;
 
+import jakarta.validation.Valid;
 import org.example.finance.security.JwtService;
 import org.example.finance.security.RefreshToken;
 import org.example.finance.security.RefreshTokenService;
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public RegisterUserResponse register(@RequestBody RegisterUserRequest request) {
+    public RegisterUserResponse register(@Valid @RequestBody RegisterUserRequest request) {
         User user = registerUserService.register(
                 request.name(),
                 request.email(),
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public LoginUserResponse login(@RequestBody LoginUserRequest request) {
+    public LoginUserResponse login(@Valid @RequestBody LoginUserRequest request) {
         User user = loginUserService.login(
                 request.email(),
                 request.password());
@@ -52,13 +53,13 @@ public class UserController {
     }
 
     @PostMapping("/refresh")
-    public RefreshTokenResponse refreshAccessToken(@RequestBody RefreshTokenRequest request) {
+    public RefreshTokenResponse refreshAccessToken(@Valid @RequestBody RefreshTokenRequest request) {
         String accessToken = refreshAccessTokenService.refreshAccessToken(request.refreshToken());
         return new RefreshTokenResponse(accessToken);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
         logoutUserService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();
     }

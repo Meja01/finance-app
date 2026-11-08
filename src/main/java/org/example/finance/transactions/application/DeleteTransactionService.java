@@ -1,5 +1,6 @@
 package org.example.finance.transactions.application;
 
+import org.example.finance.common.exception.ForbiddenOperationException;
 import org.example.finance.transactions.domain.Transaction;
 import org.example.finance.transactions.domain.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class DeleteTransactionService {
     public void deleteTransaction(UUID transactionId, UUID userId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new IllegalArgumentException("Transaction not found!"));
         if (!transaction.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Transaction does not belong to user!");
+            throw new ForbiddenOperationException("Transaction does not belong to user!");
         }
         transactionRepository.delete(transaction);
     }

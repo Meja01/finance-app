@@ -1,5 +1,6 @@
 package org.example.finance.transactions.application;
 
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.*;
 import org.example.finance.transactions.infrastructure.CategoryStatsResponse;
 import org.example.finance.transactions.infrastructure.MonthlyStatsResponse;
@@ -78,7 +79,7 @@ public class MonthlyStatsService {
 
         for (Map.Entry<UUID, BigDecimal> entry : totalsByCategory.entrySet()) {
             Category category = categoryRepository.findById(entry.getKey()).orElseThrow(() ->
-                    new IllegalStateException("Category not found!")
+                    new ResourceNotFoundException("Category not found!")
             );
             categories.add(
                     new CategoryStatsResponse(category.getId(), category.getName(), entry.getValue())

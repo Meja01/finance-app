@@ -7,6 +7,8 @@ import org.example.finance.accounts.infrastructure.SpringDataAccountRepository;
 import org.example.finance.budgets.domain.Budget;
 import org.example.finance.budgets.infrastructure.BudgetProgressResponse;
 import org.example.finance.budgets.infrastructure.SpringDataBudgetRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.application.CreateCategoryService;
 import org.example.finance.transactions.application.CreateTransactionService;
 import org.example.finance.transactions.domain.Category;
@@ -162,8 +164,8 @@ class BudgetServiceIntegrationTest {
                 TransactionType.EXPENSE
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> createBudgetService.createBudget(
                         user1.getId(),
                         categoryForUser2.getId(),
@@ -174,6 +176,30 @@ class BudgetServiceIntegrationTest {
         );
 
         assertEquals("Category must either be global or belong to the user!", exception.getMessage());
+    }
+
+    @Test
+    void cannotCreateBudgetWithMissingCategory() {
+        User user = registerUserService.register(
+                "User One",
+                "user1@example.com",
+                "secret1234"
+        );
+
+        UUID missingCategoryId = UUID.randomUUID();
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> createBudgetService.createBudget(
+                        user.getId(),
+                        missingCategoryId,
+                        2026,
+                        10,
+                        new BigDecimal("300.00")
+                )
+        );
+
+        assertEquals("Category not found!", exception.getMessage());
     }
 
     @Test
@@ -317,8 +343,8 @@ class BudgetServiceIntegrationTest {
                 new BigDecimal("200.00")
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> updateBudgetService.updateBudget(
                         budget.getId(),
                         otherUser.getId(),
@@ -390,8 +416,8 @@ class BudgetServiceIntegrationTest {
                 new BigDecimal("200.00")
         );
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ForbiddenOperationException exception = assertThrows(
+                ForbiddenOperationException.class,
                 () -> deleteBudgetService.deleteBudget(
                         budget.getId(),
                         otherUser.getId()

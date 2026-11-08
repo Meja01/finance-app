@@ -1,5 +1,6 @@
 package org.example.finance.security.application;
 
+import org.example.finance.common.exception.InvalidRefreshTokenException;
 import org.example.finance.security.JwtService;
 import org.example.finance.security.RefreshToken;
 import org.example.finance.security.RefreshTokenService;
@@ -105,8 +106,8 @@ class RefreshTokenIntegrationTest {
 
         logoutUserService.logout(refreshToken.getToken());
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        InvalidRefreshTokenException exception = assertThrows(
+                InvalidRefreshTokenException.class,
                 () -> refreshAccessTokenService.refreshAccessToken(
                         refreshToken.getToken()
                 )
@@ -156,8 +157,8 @@ class RefreshTokenIntegrationTest {
 
         springDataRefreshTokenRepository.save(expiredToken);
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        InvalidRefreshTokenException exception = assertThrows(
+                InvalidRefreshTokenException.class,
                 () -> refreshAccessTokenService.refreshAccessToken(
                         expiredToken.getToken()
                 )
@@ -168,8 +169,8 @@ class RefreshTokenIntegrationTest {
 
     @Test
     void unknownRefreshTokenIsRejected() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        InvalidRefreshTokenException exception = assertThrows(
+                InvalidRefreshTokenException.class,
                 () -> refreshAccessTokenService.refreshAccessToken(
                         "this-token-does-not-exist"
                 )

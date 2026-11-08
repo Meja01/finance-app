@@ -1,7 +1,8 @@
 package org.example.finance.transactions.application;
 
-import org.example.finance.accounts.application.CreateAccountService;
 import org.example.finance.accounts.infrastructure.SpringDataAccountRepository;
+import org.example.finance.common.exception.ForbiddenOperationException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.transactions.domain.Category;
 import org.example.finance.transactions.domain.TransactionType;
 import org.example.finance.transactions.infrastructure.SpringDataCategoryRepository;
@@ -9,11 +10,12 @@ import org.example.finance.transactions.infrastructure.SpringDataTransactionRepo
 import org.example.finance.users.application.RegisterUserService;
 import org.example.finance.users.domain.User;
 import org.example.finance.users.infrastructure.SpringDataUserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CategoryServiceIntegrationTest {
     @Autowired
     private CreateCategoryService createCategoryService;
+
+    @Autowired
+    private DeleteCategoryService deleteCategoryService;
 
     @Autowired
     private RegisterUserService registerUserService;
@@ -120,5 +125,50 @@ public class CategoryServiceIntegrationTest {
         assertNotNull(category2);
 
         assertNotEquals(category1.getId(), category2.getId());
+    }
+
+    @Test
+    void deleteCategoryThrowsForbiddenAndNotFoundWhenAppropriate() {
+        User owner = registerUserService.register(
+                "Owner",
+                "owner@example.com",
+                "secret1234"
+        );
+
+        User otherUser = registerUserService.register(
+                "Other User",
+                "other@example.com",
+                "secret1234"
+        );
+
+        Category category = createCategoryService.createCategory(
+                owner.getId(),
+                "Gym",
+                TransactionType.EXPENSE
+        );
+
+        ForbiddenOperationException forbiddenException = assertThrows(
+                ForbiddenOperationException.class,
+                () -> deleteCategoryService.deleteCategory(
+                        category.getId(),
+                        otherUser.getId()
+                )
+        );
+
+        assertEquals("Category does not belong to user!", forbiddenException.getMessage());
+
+        assertTrue(springDataCategoryRepository.findById(category.getId()).isPresent());
+
+        UUID missingCategoryId = UUID.randomUUID();
+
+        ResourceNotFoundException notFoundException = assertThrows(
+                ResourceNotFoundException.class,
+                () -> deleteCategoryService.deleteCategory(
+                        missingCategoryId,
+                        owner.getId()
+                )
+        );
+
+        assertEquals("Category not found!", notFoundException.getMessage());
     }
 }

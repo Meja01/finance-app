@@ -1,5 +1,7 @@
 package org.example.finance.users.application;
 
+import org.example.finance.common.exception.InvalidRefreshTokenException;
+import org.example.finance.common.exception.ResourceNotFoundException;
 import org.example.finance.security.JwtService;
 import org.example.finance.security.RefreshToken;
 import org.example.finance.security.RefreshTokenRepository;
@@ -24,17 +26,20 @@ public class RefreshAccessTokenService {
 
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Refresh Token is invalid!"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Refresh Token is invalid!"));
+
         if (refreshToken.isRevoked()) {
-            throw new IllegalArgumentException("Refresh Token is invalid!");
+            throw new InvalidRefreshTokenException("Refresh Token is invalid!");
         }
+
         if (!refreshToken.getExpiresAt().isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Refresh Token is expired!");
+            throw new InvalidRefreshTokenException("Refresh Token is expired!");
         }
 
         UUID userId = refreshToken.getUserId();
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
         return jwtService.generateToken(user);
     }
 }

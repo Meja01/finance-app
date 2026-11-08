@@ -1,5 +1,6 @@
 package org.example.finance.users.application;
 
+import org.example.finance.common.exception.InvalidCredentialsException;
 import org.example.finance.users.domain.User;
 import org.example.finance.users.infrastructure.SpringDataUserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -57,8 +58,8 @@ public class LoginUserServiceIntegrationTest {
         assertNotNull(user);
         assertEquals("testuser@example.com", user.getEmail());
 
-        IllegalArgumentException exceptionIncorrectEmail = assertThrows(
-                IllegalArgumentException.class,
+        InvalidCredentialsException exceptionIncorrectEmail = assertThrows(
+                InvalidCredentialsException.class,
                 () -> loginUserService.login(
                         "testuser1@example.com",
                         "secret123"
@@ -67,8 +68,8 @@ public class LoginUserServiceIntegrationTest {
 
         assertEquals("Invalid Credentials!", exceptionIncorrectEmail.getMessage());
 
-        IllegalArgumentException exceptionIncorrectPassword = assertThrows(
-                IllegalArgumentException.class,
+        InvalidCredentialsException exceptionIncorrectPassword = assertThrows(
+                InvalidCredentialsException.class,
                 () -> loginUserService.login(
                         "testuser@example.com",
                         "secret1423"
