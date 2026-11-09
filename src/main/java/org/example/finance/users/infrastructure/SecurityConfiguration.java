@@ -2,6 +2,7 @@ package org.example.finance.users.infrastructure;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.finance.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,9 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfiguration {
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -61,7 +65,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
         );
