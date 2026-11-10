@@ -42,6 +42,7 @@ function App() {
     const { t, i18n } = useTranslation()
     const [accountsError, setAccountsError] = useState<string | null>(null)
     const [categoriesError, setCategoriesError] = useState<string | null>(null)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (!accessToken) {
@@ -110,133 +111,227 @@ function App() {
         )
     }
 
-    return (<div className="app-shell">
-                {isAuthenticated && (
-                    <aside className="sidebar">
-                        <div className="sidebar-header">
-                            <h1>{t("appTitle")}</h1>
-                        </div>
+    return (
+        <div className="app-shell">
+            {isAuthenticated && (
+                <div className="mobile-topbar">
+                    <button
+                        className="mobile-menu-button"
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        aria-label="Open navigation"
+                    >
+                        ☰
+                    </button>
 
-                        <nav className="sidebar-nav">
-                            <button className={currentPage === "dashboard" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("dashboard")}>
-                                {t("navigation.dashboard")}
-                            </button>
+                    <span>{t("appTitle")}</span>
+                </div>
+            )}
 
-                            <button className={currentPage === "accounts" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("accounts")}>
-                                {t("navigation.accounts")}
-                            </button>
+            {isAuthenticated && isMobileMenuOpen && (
+                <button
+                    className="sidebar-backdrop"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    aria-label="Close navigation"
+                />
+            )}
 
-                            <button className={currentPage === "transactions" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("transactions")}>
-                                {t("navigation.transactions")}
-                            </button>
+            {isAuthenticated && (
+                <aside className={`sidebar ${isMobileMenuOpen ? "open" : ""}`}>
+                    <div className="sidebar-header">
+                        <h1>{t("appTitle")}</h1>
 
-                            <button className={currentPage === "categories" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("categories")}>
-                                {t("navigation.categories")}
-                            </button>
-
-                            <button className={currentPage === "budgets" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("budgets")}>
-                                {t("navigation.budgets")}
-                            </button>
-
-                            <button className={currentPage === "recurring" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("recurring")}>
-                                {t("navigation.recurring")}
-                            </button>
-
-                            <button className={currentPage === "statistics" ? "nav-item active" : "nav-item"}
-                                onClick={() => setCurrentPage("statistics")}>
-                                {t("navigation.statistics")}
-                            </button>
-                        </nav>
-
-                        <div className="sidebar-footer">
-                            <select
-                                value={i18n.language}
-                                onChange={event =>
-                                    i18n.changeLanguage(event.target.value)
-                                }
-                            >
-                                <option value="en">English</option>
-                                <option value="de">Deutsch</option>
-                            </select>
-
-                            <button onClick={handleLogout}>
-                                {t("navigation.logout")}
-                            </button>
-                        </div>
-                    </aside>
-                )}
-
-                <main className="main-content">
-                    <div className="content-container">
-                        {!isAuthenticated && (
-                            <AuthSection/>
-                        )}
-
-                        {isAuthenticated && currentPage === "dashboard" && (
-                            <DashboardSection/>
-                        )}
-
-                        {isAuthenticated && currentPage === "accounts" && (
-                            <AccountSection
-                                accounts={accounts}
-                                setAccounts={setAccounts}
-                                accountsLoaded={accountsLoaded}
-                                accountsError={accountsError}
-                            />
-                        )}
-
-                        {isAuthenticated && currentPage === "transactions" && (
-                            <TransactionSection
-                                accounts={accounts}
-                                accountsLoaded={accountsLoaded}
-                                categories={categories}
-                                categoriesLoaded={categoriesLoaded}
-                                categoriesError={categoriesError}
-                                accountsError={accountsError}
-                            />
-                        )}
-
-                        {isAuthenticated && currentPage === "categories" && (
-                            <CategorySection
-                                categories={categories}
-                                setCategories={setCategories}
-                                categoriesLoaded={categoriesLoaded}
-                                categoriesError={categoriesError}
-                            />
-                        )}
-
-                        {isAuthenticated && currentPage === "budgets" && (
-                            <BudgetSection
-                                categories={categories}
-                                categoriesLoaded={categoriesLoaded}
-                                categoriesError={categoriesError}
-                            />
-                        )}
-
-                        {isAuthenticated && currentPage === "recurring" && (
-                            <RecurringTransactionSection
-                                accounts={accounts}
-                                accountsLoaded={accountsLoaded}
-                                categories={categories}
-                                categoriesLoaded={categoriesLoaded}
-                                categoriesError={categoriesError}
-                                accountsError={accountsError}
-                            />
-                        )}
-
-                        {isAuthenticated && currentPage === "statistics" && (
-                            <StatsSection/>
-                        )}
+                        <button
+                            className="mobile-menu-close"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            aria-label="Close navigation"
+                        >
+                            ✕
+                        </button>
                     </div>
-                </main>
-            </div>
-    )
+
+                    <nav className="sidebar-nav">
+                        <button
+                            className={
+                                currentPage === "dashboard"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("dashboard");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.dashboard")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "accounts"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("accounts");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.accounts")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "transactions"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("transactions");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.transactions")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "categories"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("categories");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.categories")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "budgets"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("budgets");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.budgets")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "recurring"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("recurring");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.recurring")}
+                        </button>
+
+                        <button
+                            className={
+                                currentPage === "statistics"
+                                    ? "nav-item active"
+                                    : "nav-item"
+                            }
+                            onClick={() => {
+                                setCurrentPage("statistics");
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            {t("navigation.statistics")}
+                        </button>
+                    </nav>
+
+                    <div className="sidebar-footer">
+                        <select
+                            value={i18n.language}
+                            onChange={event =>
+                                i18n.changeLanguage(event.target.value)
+                            }
+                        >
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+
+                        <button onClick={handleLogout}>
+                            {t("navigation.logout")}
+                        </button>
+                    </div>
+                </aside>
+            )}
+
+            <main className="main-content">
+                <div className="content-container">
+                    {!isAuthenticated && (
+                        <AuthSection />
+                    )}
+
+                    {isAuthenticated && currentPage === "dashboard" && (
+                        <DashboardSection />
+                    )}
+
+                    {isAuthenticated && currentPage === "accounts" && (
+                        <AccountSection
+                            accounts={accounts}
+                            setAccounts={setAccounts}
+                            accountsLoaded={accountsLoaded}
+                            accountsError={accountsError}
+                        />
+                    )}
+
+                    {isAuthenticated && currentPage === "transactions" && (
+                        <TransactionSection
+                            accounts={accounts}
+                            accountsLoaded={accountsLoaded}
+                            categories={categories}
+                            categoriesLoaded={categoriesLoaded}
+                            categoriesError={categoriesError}
+                            accountsError={accountsError}
+                        />
+                    )}
+
+                    {isAuthenticated && currentPage === "categories" && (
+                        <CategorySection
+                            categories={categories}
+                            setCategories={setCategories}
+                            categoriesLoaded={categoriesLoaded}
+                            categoriesError={categoriesError}
+                        />
+                    )}
+
+                    {isAuthenticated && currentPage === "budgets" && (
+                        <BudgetSection
+                            categories={categories}
+                            categoriesLoaded={categoriesLoaded}
+                            categoriesError={categoriesError}
+                        />
+                    )}
+
+                    {isAuthenticated && currentPage === "recurring" && (
+                        <RecurringTransactionSection
+                            accounts={accounts}
+                            accountsLoaded={accountsLoaded}
+                            categories={categories}
+                            categoriesLoaded={categoriesLoaded}
+                            categoriesError={categoriesError}
+                            accountsError={accountsError}
+                        />
+                    )}
+
+                    {isAuthenticated && currentPage === "statistics" && (
+                        <StatsSection />
+                    )}
+                </div>
+            </main>
+        </div>
+    );
 }
 
 export default App

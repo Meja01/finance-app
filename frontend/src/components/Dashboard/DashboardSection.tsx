@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {useAuth} from "../../auth/useAuth.ts";
 import {formatCurrency} from "../utils/formatCurrency.ts";
 import type {CategoryStats} from "../../types/CategoryStats.ts";
-import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts"
+import {Pie, PieChart, ResponsiveContainer, Sector, Tooltip, type PieSectorShapeProps} from "recharts"
 import {API_URL} from "../../config/api.ts";
 
 
@@ -24,6 +24,24 @@ function DashboardSection() {
     const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([])
     const [categoryStatsLoading, setCategoryStatsLoading] = useState(true)
     const [categoryStatsError, setCategoryStatsError] = useState<string | null>(null)
+
+    const PIE_COLORS = [
+        "#2563eb",
+        "#16a34a",
+        "#dc2626",
+        "#f59e0b",
+        "#7c3aed",
+        "#0891b2"
+    ];
+
+    const renderPieSector = (props: PieSectorShapeProps) => {
+        return (
+            <Sector
+                {...props}
+                fill={PIE_COLORS[props.index % PIE_COLORS.length]}
+            />
+        );
+    };
 
     useEffect(() => {
         if (!accessToken) {
@@ -237,14 +255,17 @@ function DashboardSection() {
                     !categoryChartError &&
                     categoryStats.length > 0 && (
                         <ResponsiveContainer width="100%" height={320}>
-                            <BarChart data={categoryStats}>
-                                <CartesianGrid strokeDasharray="3 3" />
-
-                                <XAxis dataKey="categoryName" />
-
-                                <YAxis
-                                    tickFormatter={(value) =>
-                                        formatCurrency(value, i18n.language)
+                            <PieChart>
+                                <Pie
+                                    data={categoryStats}
+                                    dataKey="amount"
+                                    nameKey="categoryName"
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={100}
+                                    shape={renderPieSector}
+                                    label={({ name, percent }) =>
+                                        `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                                     }
                                 />
 
@@ -255,14 +276,7 @@ function DashboardSection() {
                                             : value
                                     }
                                 />
-
-                                <Bar
-                                    dataKey="amount"
-                                    name={t("statistics.amount")}
-                                    fill="#2563eb"
-                                    radius={[6, 6, 0, 0]}
-                                />
-                            </BarChart>
+                            </PieChart>
                         </ResponsiveContainer>
                     )}
             </div>
