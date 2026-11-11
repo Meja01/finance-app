@@ -258,6 +258,7 @@ function App() {
                         >
                             <option value="en">English</option>
                             <option value="de">Deutsch</option>
+                            <option value="sr">Srpski</option>
                         </select>
 
                         <button onClick={handleLogout}>
