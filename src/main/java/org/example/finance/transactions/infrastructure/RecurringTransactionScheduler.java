@@ -1,6 +1,8 @@
 package org.example.finance.transactions.infrastructure;
 
 import org.example.finance.transactions.application.GenerateRecurringTransactionsService;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,11 @@ public class RecurringTransactionScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void generateRecurringTransactions() {
+        generateService.generateDueTransactions(LocalDate.now());
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void generateRecurringTransactionsOnStartup() {
         generateService.generateDueTransactions(LocalDate.now());
     }
 }
