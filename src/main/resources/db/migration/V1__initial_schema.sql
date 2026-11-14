@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict 4r04TX2YeLDtbDmolBDRrgxFqOp3uC7WuYQ9QbQojartzSepAFm1nZgELiXyWC8
-
 -- Dumped from database version 15.19
 -- Dumped by pg_dump version 15.19
 
@@ -209,6 +207,4 @@ ALTER TABLE ONLY public.users
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict 4r04TX2YeLDtbDmolBDRrgxFqOp3uC7WuYQ9QbQojartzSepAFm1nZgELiXyWC8
 
