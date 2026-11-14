@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/register", "/users/login", "/users/refresh", "/users/logout").permitAll()
+                        .requestMatchers("/users/register", "/users/login", "/users/refresh", "/users/logout", "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
